@@ -45,45 +45,7 @@ end
 fn = 200; 
 speedf2 = filter(1/fn*ones(fn,1),1,speed2);
 
-% dpost = pos(dpos~=0);
-% test = 6000./(res*diff(dABsum));
-%dABt = Bt(1:numel(dAt)).*dAt;
-% dAt2 = 60./(res*dAt);
-% speed = 0;
-% j=0;
-% s = zeros(size(dAB));
-% for i=1:numel(dAB)
-%     if ( dA(i) == 1 )
-%         if( j > 0 )
-%             speed = dAt2(j);
-%         end
-%         j=j+1;
-%     elseif ( dAB(i) == -1 )
-%         speed = -dAt2(j);
-%         j=j+1;
-%     end
-%     s(i) = speed;
-% end
-% 
-% for i=(fl+1):numel(dAB)
-%     s(i)=(dABsum(i)-dABsum(i-fl))/(t(i)-t(i-fl));
-% end
 
-        
-% fdAt = filter(1/fn*ones(fn,1),1,dAt2);
-% % 
-% dZ = diff(Z)==1;
-% Zt = time(diff(Z)==1);
-% dZt = 60./diff(Zt);
-% 
-% nt = n(diff(Z)==1);
-% nt2 = n(diff(Z)==-1);
-% nt2-nt;
-% 
-% for i=1:numel(nt)-1
-% sum(dA(nt(i):nt(i+1)))
-% end
-%
 plot(t(2:end),10*pos2,'k',t2(2:end),speed,'b',t2(2:end),speedf,'g',t,speedf2,'r');
 %plot(linspace(0,st*length(data),numel(pos)),pos);%,linspace(0,st*length(data),numel(s)),s);
 %plot(linspace(0,st*length(data),numel(dAt2)),dAt2,linspace(0,st*length(data),numel(fdAt)),fdAt,'r');%,Bt(1:numel(fdBt)),fdBt,Zt(1:numel(dZt)),dZt);
