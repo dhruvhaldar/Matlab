@@ -6,9 +6,8 @@ HUMERUS = 146.05;      % shoulder to elbow
 ULNA = 187.325;        % elbow to wrist 
 HAND = 90.0;           % wrist to gripper tip
 
-delta = 10;
-
-delta2 = 10;
+threshold = 10;
+deltamax = 7.5;
 
 basAngle_d = 90;
 shlAngle_d = 90;
@@ -17,18 +16,16 @@ wriAngle_d = 90;
 
 [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 
-tip_h_max = tip_h;
-
-ri = wri_r;
-hi = wri_h;
-thetai = basAngle_d;
+wri0r = wri_r;
+wri0h = wri_h;
+theta0 = basAngle_d;
 
 dr = 0.5;
 dh = -1;
-dtheta = 0.005;
+dtheta = 0.5;
 hvec = tip_h:dh:0;
 rvec = tip_r:dr:(wri_r+(length(hvec)-1)*dr);
-thvec = basAngle_d:dtheta:(basAngle_d+(length(hvec)-1)*dtheta);
+thvec = theta0:dtheta:(theta0+(length(hvec)-1)*dtheta);
 
 for i=2:length(hvec)
 
@@ -40,61 +37,72 @@ r1 = wri_r; h1 = wri_h; x1 = wri_r*sind(basAngle_d); y1 = wri_r*cosd(basAngle_d)
 
 basAngle_d = thvec(i);
 
-r2 = wri_r; h2 = wri_h; x2 = wri_r*sind(basAngle_d); y2 = wri_r*cosd(basAngle_d);
+r2 = wri_r; h2 = wri_h; wri1x = wri_r*sind(basAngle_d); wri1y = wri_r*cosd(basAngle_d); wri1z = wri_h;
 
-elbx = elb_r*sind(basAngle_d); elby = elb_r*cosd(basAngle_d);
+elb1x = elb_r*sind(basAngle_d); elb1y = elb_r*cosd(basAngle_d); elb1z = elb_h;
+
+tip1x = tip_r*sind(basAngle_d); tip1y = tip_r*cosd(basAngle_d); tip1z = tip_h;
 
 dh = h2-h1; dr = r2-r1;
 
 m = dh/dr; c = h1-m*r1;
-theta = atan2d(dr,-dh);
+omega = atan2d(dr,-dh);
 
-a2 = HUMERUS*cosd(shlAngle_d+delta);
+delta = [-deltamax 0 deltamax];
 
-b2 = HUMERUS*sind(shlAngle_d+delta) + BASE_HEIGHT;
+elbr = HUMERUS*cosd(shlAngle_d+threshold-delta);
 
-d = abs((r2-r1)*(h1-b2)-(r1-a2)*(h2-h1))/sqrt((r2-r1)^2+(h2-h1)^2);
+elbz = HUMERUS*sind(shlAngle_d+threshold-delta) + BASE_HEIGHT;
 
-e = shlAngle_d + delta2 + elbAngle_d - 180;
+d = abs((r2-r1)*(h1-elbz)-(r1-elbr)*(h2-h1))/sqrt((r2-r1)^2+(h2-h1)^2);
 
-if (e < ULNA)
-    e2 = theta - acosd(d/ULNA);
-    if (e2 < e)
-        e = e2;
+phi = shlAngle_d + threshold-delta + elbAngle_d - 180;
+
+for i=1:length(phi)
+
+    if (phi(i) < ULNA)
+        if (phi(i) > omega - acosd(d(i)/ULNA))
+            phi(i) = omega - acosd(d(i)/ULNA);
+        end
     end
+
 end
 
-a3 = a2 + ULNA*cosd(e);
-b3 = b2 + ULNA*sind(e);
-th = thetai + (a3-ri)*dtheta/dr;
+wrir = elbr + ULNA*cosd(phi);
+wriz = elbz + ULNA*sind(phi);
+theta = theta0 + (wrir-wri0r)*dtheta/dr;
 
-a2x = a2*sind(th);
-a2y = a2*cosd(th);
-a2z = b2;
+wrix = wrir.*sind(theta);
+wriy = wrir.*cosd(theta);
 
-a3x = a3*sind(th);
-a3y = a3*cosd(th);
-a3z = b3;
+elbx = elbr.*sind(theta);
+elby = elbr.*cosd(theta);
 
-C = cross([x2-elbx,y2-elby,h2-elb_h],[a2x-elbx,a2y-elby,a2z-elb_h]);
+t = linspace(0,1,50);
+s = linspace(0,1,50)';
+%s = norminv(s,0.5,0.2);
 
-t = linspace(0,1,2);
-
-ux = elbx + t*(x2-elbx);
-uy = elby + t*(y2-elby);
-uz = elb_h + t*(h2-elb_h);
-vx = a2x + t*(a3x-a2x);
-vy = a2y + t*(a3y-a2y);
-vz = a2z + t*(a3z-a2z);
-
-s = linspace(0,1,100)';
+ux1 = 0 + t*(elbx(1)); uy1 = 0 + t*(elby(1)); uz1 = BASE_HEIGHT + t*(elbz(1)-BASE_HEIGHT);
+vx1 = 0 + t*(elbx(3)); vy1 = 0 + t*(elby(3)); vz1 = BASE_HEIGHT + t*(elbz(3)-BASE_HEIGHT);
 
 for n=1:length(s)
-    wx(:,n) = ux + s(n)*(vx-ux);
-    wy(:,n) = uy + s(n)*(vy-uy);
-    wz(:,n) = uz + s(n)*(vz-uz);
+    wx1(:,n) = ux1 + s(n)*(vx1-ux1); wy1(:,n) = uy1 + s(n)*(vy1-uy1); wz1(:,n) = uz1 + s(n)*(vz1-uz1); 
 end
 
+ux2 = elbx(1) + t*(wrix(1)-elbx(1)); uy2 = elby(1) + t*(wriy(1)-elby(1)); uz2 = elbz(1) + t*(wriz(1)-elbz(1));
+vx2 = elbx(3) + t*(wrix(3)-elbx(3)); vy2 = elby(3) + t*(wriy(3)-elby(3)); vz2 = elbz(3) + t*(wriz(3)-elbz(3));
+
+for n=1:length(s)
+    wx2(:,n) = ux2 + s(n)*(vx2-ux2); wy2(:,n) = uy2 + s(n)*(vy2-uy2); wz2(:,n) = uz2 + s(n)*(vz2-uz2);
+    C(:,n) = (1-normpdf(s(n),0.5,0.2))*ones(size(t));
+end
+
+ux3 = wrix(1) + t*0; uy3 = wriy(1) + t*0; uz3 = wriz(1) - t*HAND;
+vx3 = wrix(3) + t*0; vy3 = wriy(3) + t*0; vz3 = wriz(3) - t*HAND;
+
+for n=1:length(s)
+    wx3(:,n) = ux3 + s(n)*(vx3-ux3); wy3(:,n) = uy3 + s(n)*(vy3-uy3); wz3(:,n) = uz3 + s(n)*(vz3-uz3);
+end
 
 
 % syms x y a b m c u
@@ -108,7 +116,12 @@ end
 t1 = -500;
 t2 = 500;
 
-plot3(wx,wy,wz,'m',[0, 0, elb_r*sind(basAngle_d), x2, tip_r*sind(basAngle_d)],[0, 0, elb_r*cosd(basAngle_d), y2, tip_r*cosd(basAngle_d)],[0, BASE_HEIGHT, elb_h, h2, tip_h], 'r', [0*sind(basAngle_d) a2x a3x a3x],[0*cosd(th) a2y a3y a3y],[BASE_HEIGHT a2z a3z, a3z-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
+%C = -gradient(wz2);
+
+surf(wx2,wy2,wz2,C);
+shading interp;
+colormap(gray);
+%plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 %plot3(x2(1),0,y2(1));
 
 %fill3([elb_r*sind(basAngle_d), x2; a2*sind(th), a3*sind(th)],[elb_r*cosd(basAngle_d), y2; a2*cosd(th) a3*cosd(th)],[elb_h, h2; b2 b3],[0 0 0])
