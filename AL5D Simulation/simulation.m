@@ -78,109 +78,41 @@ wriy = wrir.*cosd(theta);
 elbx = elbr.*sind(theta);
 elby = elbr.*cosd(theta);
 
-scale = 0.3;
-t1 = linspace(0,1,round(scale*HUMERUS));
-t2 = linspace(0,1,round(scale*ULNA));
-t3 = linspace(0,1,round(scale*HAND));
-% s = normrnd(0.5,0.2,1,length(t));
-% s = linspace(0,1,20);
-% s = norminv(s,0,1);
-% s = s + abs(min(s));
-% s = s./abs(max(s));
+t = linspace(0,1,50);
+% s = linspace(0,1,50)';
+%s = norminv(s,0.5,0.2);
+s = linspace(0.01,0.99,100)';
+c = normpdf(s,0.5,0.2);
+    c = c - min(c);
+    c = c./abs(max(c));
 
-ux1 = 0 + t1*(elbx(1)); uy1 = 0 + t1*(elby(1)); uz1 = BASE_HEIGHT + t1*(elbz(1)-BASE_HEIGHT);
-vx1 = 0 + t1*(elbx(3)); vy1 = 0 + t1*(elby(3)); vz1 = BASE_HEIGHT + t1*(elbz(3)-BASE_HEIGHT);
+ux1 = 0 + t*(elbx(1)); uy1 = 0 + t*(elby(1)); uz1 = BASE_HEIGHT + t*(elbz(1)-BASE_HEIGHT);
+vx1 = 0 + t*(elbx(3)); vy1 = 0 + t*(elby(3)); vz1 = BASE_HEIGHT + t*(elbz(3)-BASE_HEIGHT);
 
-ux2 = elbx(1) + t2*(wrix(1)-elbx(1)); uy2 = elby(1) + t2*(wriy(1)-elby(1)); uz2 = elbz(1) + t2*(wriz(1)-elbz(1));
-vx2 = elbx(3) + t2*(wrix(3)-elbx(3)); vy2 = elby(3) + t2*(wriy(3)-elby(3)); vz2 = elbz(3) + t2*(wriz(3)-elbz(3));
-
-ux3 = wrix(1) + t3*0; uy3 = wriy(1) + t3*0; uz3 = wriz(1) - t3*HAND;
-vx3 = wrix(3) + t3*0; vy3 = wriy(3) + t3*0; vz3 = wriz(3) - t3*HAND;
-
-
-% gap = 0.2;
-% ux1 = 0:sign(elbx(1))*gap:(elbx(1)); uy1 = 0:sign(elby(1))*gap:(elby(1)); uz1 = BASE_HEIGHT:sign(elbz(1)-2*BASE_HEIGHT)*gap:(elbz(1)-BASE_HEIGHT);
-% vx1 = 0:sign(elbx(3))*gap:elbx(3); vy1 = 0:sign(elby(3))*gap:(elby(3)); vz1 = BASE_HEIGHT:sign(elbz(3)-2*BASE_HEIGHT)*gap:(elbz(3)-BASE_HEIGHT);
-% 
-% if (length(ux1)<length(vx1)) ux1=linspace(min(ux1),max(ux1),length(vx1));
-% else vx1=linspace(min(vx1),max(vx1),length(ux1));
-% end
-%     
-% if (length(uy1)<length(vy1)) uy1=linspace(min(uy1),max(uy1),length(vy1));
-% else vy1=linspace(min(vy1),max(vy1),length(uy1));
-% end
-%     
-% if (length(uz1)<length(vz1)) uz1=linspace(min(uz1),max(uz1),length(vz1));
-% else vz1=linspace(min(vz1),max(vz1),length(uz1));
-% end
-%     
-% s1 = ux1:sign(vx1-ux1)*gap:vx1;
-% s2 = uy1:sign(vy1-uy1)*gap:vy1;
-% s3 = uz1:sign(vz1-uz1)*gap:vz1;
-% for n=1:length(s1)
-%     wx1(:,n) = ux1 + s1(n)'*(vx1-ux1);
-% end
-% 
-% for n=1:length(s2)
-%     wy1(:,n) = uy1 + s2(n)'*(vy1-uy1);
-% end
-% 
-% for n=1:length(s3)
-%     wz1(:,n) = uz1 + s3(n)'*(vz1-uz1);
-% end
-hold off
-plot3(0,0,0);
-hold on;
-for n=1:length(t1)
-    D = round(scale*sqrt((ux1(n)-vx1(n))^2+(uy1(n)-vy1(n))^2+(uz1(n)-vz1(n))^2));
-    if (D < 2) D = 2; end
-    s = linspace(0,1,D);
-    wx1 = ux1(n) + s*(vx1(n)-ux1(n)); wy1 = uy1(n) + s*(vy1(n)-uy1(n)); wz1 = uz1(n) + s*(vz1(n)-uz1(n));
-    plot3(wx1,wy1,wz1,'k.','MarkerSize',1);
+for n=1:length(s)
+    wx1(:,n) = ux1 + s(n)*(vx1-ux1); wy1(:,n) = uy1 + s(n)*(vy1-uy1); wz1(:,n) = uz1 + s(n)*(vz1-uz1);
 end
 
-for n=1:length(t2)
-    D = round(scale*sqrt((ux2(n)-vx2(n))^2+(uy2(n)-vy2(n))^2+(uz2(n)-vz2(n))^2));
-    if (D < 2) D = 2; end
-    s = linspace(0,1,D);
-    wx2 = ux2(n) + s*(vx2(n)-ux2(n)); wy2 = uy2(n) + s*(vy2(n)-uy2(n)); wz2 = uz2(n) + s*(vz2(n)-uz2(n)); 
-    plot3(wx2,wy2,wz2,'k.','MarkerSize',1);
+ur2 = elbr(1) + t*(wrir(1)-elbr(1)); uz2 = elbz(1) + t*(wriz(1)-elbz(1));
+vr2 = elbr(3) + t*(wrir(3)-elbr(3)); vtheta = theta(3) + t*0; vz2 = elbz(3) + t*(wriz(3)-elbz(3));
+
+for n=1:length(s)
+    wr2(:,n) = ur2 + s(n)*(vr2-ur2); wtheta(:,n) = utheta + s(n)*(vtheta-utheta); wz2(:,n) = uz2 + s(n)*(vz2-uz2);
+    C(:,n) = c(n)*ones(size(t));
 end
 
-for n=1:length(t3)
-    D = round(scale*sqrt((ux3(n)-vx3(n))^2+(uy3(n)-vy3(n))^2+(uz3(n)-vz3(n))^2));
-    if (D < 2) D = 2; end
-    s = linspace(0,1,D);
-    wx3 = ux3(n) + s*(vx3(n)-ux3(n)); wy3 = uy3(n) + s*(vy3(n)-uy3(n)); wz3 = uz3(n) + s*(vz3(n)-uz3(n)); 
-    plot3(wx3,wy3,wz3,'k.','MarkerSize',1);
+wx2 = wr2.*sind(wtheta);
+wy2 = wr2.*cosd(wtheta);
+
+ur3 = wrir(1) + t*0; uz3 = wriz(1) - t*HAND;
+vr3 = wrir(3) + t*0; vz3 = wriz(3) - t*HAND;
+
+for n=1:length(s)
+    wr3(:,n) = ur3 + s(n)*(vr3-ur3); wz3(:,n) = uz3 + s(n)*(vz3-uz3);
 end
 
-% for n=1:length(s)
-%     wx1(:,n) = ux1 + s(n)'*(vx1-ux1); wy1(:,n) = uy1 + s(n)'*(vy1-uy1); wz1(:,n) = uz1 + s(n)'*(vz1-uz1); 
-% end
-
-%wx1 = ux1 + s.*(vx1-ux1); wy1 = uy1 + s.*(vy1-uy1); wz1 = uz1 + s.*(vz1-uz1); 
-
-
-
-% for n=1:length(s)
-%     wx2(:,n) = ux2 + s(n)'*(vx2-ux2); wy2(:,n) = uy2 + s(n)'*(vy2-uy2); wz2(:,n) = uz2 + s(n)'*(vz2-uz2);
-% end
-
-% wx2 = ux2 + s.*(vx2-ux2); wy2 = uy2 + s.*(vy2-uy2); wz2 = uz2 + s.*(vz2-uz2);
-
-
-
-
-
-
-
-% for n=1:length(s)
-%     wx3(:,n) = ux3 + s(n)'*(vx3-ux3); wy3(:,n) = uy3 + s(n)'*(vy3-uy3); wz3(:,n) = uz3 + s(n)'*(vz3-uz3);
-% end
-
-% wx3 = ux3 + s.*(vx3-ux3); wy3 = uy3 + s.*(vy3-uy3); wz3 = uz3 + s.*(vz3-uz3);
-
+wx3 = wr3.*sind(wtheta);
+wy3 = wr3.*cosd(wtheta);
 
 % syms x y a b m c u
 %    
@@ -195,15 +127,15 @@ t2 = 500;
 
 %C = -gradient(wz2);
 
-plot3([0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',0.1,'LineWidth',2);
-% hold on
-% surf(wx1,wy1,wz1,C);
-% surf(wx2,wy2,wz2,C);
-% surf(wx3,wy3,wz3,C);
-hold off
-% shading interp;
 
-%plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
+plot3([0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
+hold on
+surf(wx1,wy1,wz1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(wx2,wy2,wz2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(wx3,wy3,wz3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+hold off
+shading interp;
+colormap([0.3 0.3 1]);
 %plot3(x2(1),0,y2(1));
 
 %fill3([elb_r*sind(basAngle_d), x2; a2*sind(th), a3*sind(th)],[elb_r*cosd(basAngle_d), y2; a2*cosd(th) a3*cosd(th)],[elb_h, h2; b2 b3],[0 0 0])
@@ -217,6 +149,3 @@ view(37.5,30)
 pause(0.01);
 
 end
-
-
-
