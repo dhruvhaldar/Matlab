@@ -114,6 +114,7 @@ t2 = 500;
 
 %C = -gradient(wz2);
 
+<<<<<<< HEAD
 
 plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',0.1,'LineWidth',2);
 % hold on
@@ -122,7 +123,12 @@ plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, ti
 % surf(wx3,wy3,wz3,C);
 % hold off
 % shading interp;
+=======
+surf(wx2,wy2,wz2,C);
+shading interp;
+>>>>>>> parent of 2740652... Working using gradient
 colormap(gray);
+%plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 %plot3(x2(1),0,y2(1));
 
 %fill3([elb_r*sind(basAngle_d), x2; a2*sind(th), a3*sind(th)],[elb_r*cosd(basAngle_d), y2; a2*cosd(th) a3*cosd(th)],[elb_h, h2; b2 b3],[0 0 0])
