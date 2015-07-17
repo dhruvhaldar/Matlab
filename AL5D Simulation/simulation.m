@@ -78,31 +78,27 @@ wriy = wrir.*cosd(theta);
 elbx = elbr.*sind(theta);
 elby = elbr.*cosd(theta);
 
-t = linspace(0,1,50);
-s = linspace(0,1,50)';
-%s = norminv(s,0.5,0.2);
+t = linspace(0,1,2000);
+s = normrnd(0.5,0.2,1,length(t));
+% s = linspace(0.01,0.99,100)';
+% s = norminv(s,0,1);
+% s = s + abs(min(s));
+% s = s./abs(max(s));
 
 ux1 = 0 + t*(elbx(1)); uy1 = 0 + t*(elby(1)); uz1 = BASE_HEIGHT + t*(elbz(1)-BASE_HEIGHT);
 vx1 = 0 + t*(elbx(3)); vy1 = 0 + t*(elby(3)); vz1 = BASE_HEIGHT + t*(elbz(3)-BASE_HEIGHT);
 
-for n=1:length(s)
-    wx1(:,n) = ux1 + s(n)*(vx1-ux1); wy1(:,n) = uy1 + s(n)*(vy1-uy1); wz1(:,n) = uz1 + s(n)*(vz1-uz1); 
-end
+wx1 = ux1 + s.*(vx1-ux1); wy1 = uy1 + s.*(vy1-uy1); wz1 = uz1 + s.*(vz1-uz1); 
 
 ux2 = elbx(1) + t*(wrix(1)-elbx(1)); uy2 = elby(1) + t*(wriy(1)-elby(1)); uz2 = elbz(1) + t*(wriz(1)-elbz(1));
 vx2 = elbx(3) + t*(wrix(3)-elbx(3)); vy2 = elby(3) + t*(wriy(3)-elby(3)); vz2 = elbz(3) + t*(wriz(3)-elbz(3));
 
-for n=1:length(s)
-    wx2(:,n) = ux2 + s(n)*(vx2-ux2); wy2(:,n) = uy2 + s(n)*(vy2-uy2); wz2(:,n) = uz2 + s(n)*(vz2-uz2);
-    C(:,n) = (1-normpdf(s(n),0.5,0.2))*ones(size(t));
-end
+wx2 = ux2 + s.*(vx2-ux2); wy2 = uy2 + s.*(vy2-uy2); wz2 = uz2 + s.*(vz2-uz2);
 
 ux3 = wrix(1) + t*0; uy3 = wriy(1) + t*0; uz3 = wriz(1) - t*HAND;
 vx3 = wrix(3) + t*0; vy3 = wriy(3) + t*0; vz3 = wriz(3) - t*HAND;
 
-for n=1:length(s)
-    wx3(:,n) = ux3 + s(n)*(vx3-ux3); wy3(:,n) = uy3 + s(n)*(vy3-uy3); wz3(:,n) = uz3 + s(n)*(vz3-uz3);
-end
+wx3 = ux3 + s.*(vx3-ux3); wy3 = uy3 + s.*(vy3-uy3); wz3 = uz3 + s.*(vz3-uz3);
 
 
 % syms x y a b m c u
@@ -119,13 +115,13 @@ t2 = 500;
 %C = -gradient(wz2);
 
 
-plot3([0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
-hold on
-surf(wx1,wy1,wz1,C);
-surf(wx2,wy2,wz2,C);
-surf(wx3,wy3,wz3,C);
-hold off
-shading interp;
+plot3(wx1,wy1,wz1,'k.',wx2,wy2,wz2,'k.',wx3,wy3,wz3,'k.',[0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',0.1,'LineWidth',2);
+% hold on
+% surf(wx1,wy1,wz1,C);
+% surf(wx2,wy2,wz2,C);
+% surf(wx3,wy3,wz3,C);
+% hold off
+% shading interp;
 colormap(gray);
 %plot3(x2(1),0,y2(1));
 
