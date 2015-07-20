@@ -128,7 +128,7 @@ t2 = 500;
 
 plot3([0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 hold on
-plot3(elbr(1)*sind(theta(1)),elbr(1)*cosd(theta(1)),elbz(1),'go')
+plot3(elbr(1)*sind(theta(1)),elbr(1)*cosd
 surf(wx1,wy1,wz1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 surf(wx2,wy2,wz2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 surf(wx3,wy3,wz3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
