@@ -79,10 +79,24 @@ elbx = elbr.*sind(theta);
 elby = elbr.*cosd(theta);
 
 t = linspace(0,1,50);
-s = linspace(0.01,0.99,100)';
+s = linspace(0,1,100)';
 c = normpdf(s,0.5,0.2);
 c = c - min(c);
 c = c./abs(max(c));
+
+wr = wrir(1) + s*(wrir(3)-wrir(1));
+wz = wriz(1) + s*(wriz(3)-wriz(1));
+
+for n=1:length(s)
+    s2w = wr(n)^2 + (wz(n)-BASE_HEIGHT)^2;
+    theta4 = acosd((s2w+ULNA^2-HUMERUS^2)/(2*sqrt(s2w)*ULNA))+ atan2d(wr(n),wz(n)-BASE_HEIGHT)-90;
+    wr4(n,:) = wr(n)-t*ULNA*cosd(theta4);
+    wz4(n,:) = wz(n)+t*ULNA*sind(theta4);
+    %wr4(n,:) = wr(n)-t*(wr(n)^2+ULNA^2-(wz(n)-BASE_HEIGHT)-HUMERUS^2)./(2*wr(n));
+    %wz4(n,:) = sqrt(t*ULNA - wr4(n,:));
+end
+
+
     
 ur1 = 0 + t*(elbr(1)); uz1 = BASE_HEIGHT + t*(elbz(1)-BASE_HEIGHT);
 vr1 = 0 + t*(elbr(3)); vz1 = BASE_HEIGHT + t*(elbz(3)-BASE_HEIGHT);
@@ -100,6 +114,7 @@ for n=1:length(s)
 end
 
 wtheta = ((theta(1) + s*(theta(3)-theta(1)))*ones(size(t)))';
+wtheta2 = (theta(1) + s*(theta(3)-theta(1))*ones(size(t)));
 
 wx1 = wr1.*sind(wtheta);
 wy1 = wr1.*cosd(wtheta);
@@ -110,7 +125,11 @@ wy2 = wr2.*cosd(wtheta);
 wx3 = wr3.*sind(wtheta);
 wy3 = wr3.*cosd(wtheta);
 
+wx4 = wr4.*sind(wtheta2);
+wy4 = wr4.*cosd(wtheta2);
+
 C = (c*ones(size(t)))';
+C2 = (c*ones(size(t)));
 
 % syms x y a b m c u
 %    
@@ -128,9 +147,10 @@ t2 = 500;
 
 plot3([0, 0, elb1x, wri1x, tip1x],[0, 0, elb1y, wri1y, tip1y],[0, BASE_HEIGHT, elb1z, wri1z, tip1z], 'r', [0 elbx(2) wrix(2) wrix(2)],[0 elby(2) wriy(2) wriy(2)],[BASE_HEIGHT elbz(2) wriz(2), wriz(2)-HAND],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 hold on
-plot3(elbr(1)*sind(theta(1)),elbr(1)*cosd(theta(1)),elbz(1),'go')
+%plot3(wx4,wy4,wz4,'g')
 surf(wx1,wy1,wz1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-surf(wx2,wy2,wz2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+%surf(wx2,wy2,wz2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(wx4,wy4,wz4,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C2);
 surf(wx3,wy3,wz3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 hold off
 shading interp;
