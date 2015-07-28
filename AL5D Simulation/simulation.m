@@ -16,7 +16,7 @@ wriAngle_d = 90;
 
 [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 
-[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-100, tip_h, handAngle_d);
+[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-200, tip_h, handAngle_d);
 
 [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 
@@ -24,9 +24,9 @@ wri0r = wri_r;
 wri0h = wri_h;
 theta0 = basAngle_d;
 
-dr = 0.5;
+dr = 0.5;   
 dh = -1;
-dtheta = 0.5;
+dtheta = 0.005;
 hvec = tip_h:dh:0;
 rvec = tip_r:dr:(wri_r+(length(hvec)-1)*dr);
 thvec = theta0:dtheta:(theta0+(length(hvec)-1)*dtheta);
@@ -58,18 +58,39 @@ elbr = HUMERUS*cosd(shlAngle_d+threshold-delta);
 
 elbz = HUMERUS*sind(shlAngle_d+threshold-delta) + BASE_HEIGHT;
 
-d = abs((R2-R1)*(H1-elbz)-(R1-elbr)*(H2-H1))/sqrt((R2-R1)^2+(H2-H1)^2); % minimum distance from elbow to wrist motion path
+d = ((R2-R1)*(H1-elbz)-(R1-elbr)*(H2-H1))/sqrt(dr^2+dh^2); % minimum distance from elbow to wrist motion path
 
 phi = shlAngle_d + threshold - delta + elbAngle_d - 180;
 
+holdif = 0;
+
 for j=1:length(phi)
-    if (d < ULNA)
+    if (d(j) < ULNA)
         if (phi(j) > omega - acosd(d(j)/ULNA))
             phi(j) = omega - acosd(d(j)/ULNA);
         end
     else
         if (phi(j) > omega)
             phi(j) = omega;
+            rvec2 = linspace(-300,300,1000);
+            offset = ULNA*sqrt(dr^2+dh^2)/dr;
+            hvec2 = (dh/dr).*(rvec2-R1)+H1-offset;
+            const = (R1*dh/dr + BASE_HEIGHT - H1 + offset)/HUMERUS;
+            A = dh/dr;
+            B = 1;
+            M = sqrt(A^2+B^2);
+            MAX = (A^2+B^2)/M;
+            if (abs(const) > abs(MAX))
+                fprintf('%4.2f > %4.2f\n',const,MAX);
+            else
+%             thetaa = 2*atan2d(sqrt(X^2+Y^2-C^2)-X,C+Y)
+            thetaa = acosd(const/M)+atan2d(B,A);
+            elbr(j);
+            elbr(j)=HUMERUS*cosd(thetaa);
+            elbz(j);
+            elbz(j)=HUMERUS*sind(thetaa)+BASE_HEIGHT;
+            holdif = 1;
+            end
         end
     end
 end
@@ -83,6 +104,12 @@ wriy = wrir.*cosd(theta);
 
 elbx = elbr.*sind(theta);
 elby = elbr.*cosd(theta);
+
+% if(holdif)elbr
+%     elbR
+%     elbz
+%     elbZ
+% end
 
 t = linspace(0,1,50);
 s = linspace(0,1,100)';
@@ -128,12 +155,14 @@ surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 hold off
 shading interp;
 colormap([0.3 0.3 1]);
+axis equal
 
 axis([-1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), -1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), 0, 1.1*(BASE_HEIGHT+HUMERUS)])
 
 grid on
 
-view(37.5,30)
+view(0,0)
+% view(37.5,30)
 
 pause(0.01);
 
