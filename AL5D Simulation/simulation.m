@@ -71,44 +71,19 @@ phi = shlAngle_d + threshold - delta + elbAngle_d - 180;
 holdif = 0;
 
 for j=1:length(phi)
+	if (d(j) < ULNA) threshold = 10;
+    else threshold = -10;
+    end
+    elbr = HUMERUS*cosd(shlAngle_d+threshold-delta);
+    elbz = HUMERUS*sind(shlAngle_d+threshold-delta) + BASE_HEIGHT;
+    phi(j) = shlAngle_d + threshold - delta(j) + elbAngle_d - 180;
     if (d(j) < ULNA)
         if (phi(j) > omega - acosd(d(j)/ULNA))
             phi(j) = omega - acosd(d(j)/ULNA);
         end
     else
-        threshold = -threshold
-        elbr = HUMERUS*cosd(shlAngle_d+threshold-delta);
-
-        elbz = HUMERUS*sind(shlAngle_d+threshold-delta) + BASE_HEIGHT;
-
-        d = ((R2-R1)*(H1-elbz)-(R1-elbr)*(H2-H1))/sqrt(dr^2+dh^2); % minimum distance from elbow to wrist motion path
-
-        phi = shlAngle_d + threshold - delta + elbAngle_d - 180;
-        
-        if (phi(j) > omega - acosd(d(j)/ULNA))
-            phi(j) = omega - acosd(d(j)/ULNA);
-        end
-%         if (phi(j) > omega)
-%             phi(j) = omega;
-%             rvec2 = linspace(-300,300,1000);
-%             offset = ULNA*sqrt(dr^2+dh^2)/dr;
-%             hvec2 = (dh/dr).*(rvec2-R1)+H1-offset;
-%             const = (R1*dh/dr + BASE_HEIGHT - H1 + offset)/HUMERUS;
-%             A = dh/dr;
-%             B = 1;
-%             M = sqrt(A^2+B^2);
-%             MAX = (A^2+B^2)/M;
-%             if (abs(const) > abs(MAX))
-%                 fprintf('%4.2f > %4.2f\n',const,MAX);
-%             else
-% %             thetaa = 2*atan2d(sqrt(X^2+Y^2-C^2)-X,C+Y)
-%             thetaa = acosd(const/M)+atan2d(B,A);
-%             elbr(j);
-%             elbr(j)=HUMERUS*cosd(thetaa);
-%             elbz(j);
-%             elbz(j)=HUMERUS*sind(thetaa)+BASE_HEIGHT;
-%             holdif = 1;
-%             end
+%         if (phi(j) > omega - acosd(d(j)/ULNA))
+%             phi(j) = omega - acosd(d(j)/ULNA);
 %         end
     end
 end
