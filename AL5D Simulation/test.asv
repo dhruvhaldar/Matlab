@@ -21,7 +21,7 @@ tr = diff(t,r);
 % a2x = solve(a2==x,r)
 % 
 % solve(a1x+a2x==y,x)
-funky = @(r) t;
+funky = (@r) t;
 
 
 
