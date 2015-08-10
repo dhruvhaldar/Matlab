@@ -60,13 +60,9 @@ delta = [-deltamax 0 deltamax];
 
 threshold = 10;
 
-for k=1:length(delta)
-    [wrir(k), wrih(k), theta(k)] = findLimit(ri,hi,dr,dh,rvec(index),delta+threshold);
-end
+elbr = HUMERUS*cosd(shlAngle_d+threshold-delta);
 
-elbr = HUMERUS*cosd(theta);
-
-elbz = HUMERUS*sind(theta) + BASE_HEIGHT;
+elbz = HUMERUS*sind(shlAngle_d+threshold-delta) + BASE_HEIGHT;
 
 d = ((R2-R1)*(H1-elbz)-(R1-elbr)*(H2-H1))/sqrt(dr^2+dh^2); % minimum distance from elbow to wrist motion path
 
