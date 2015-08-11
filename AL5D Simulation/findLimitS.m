@@ -1,36 +1,44 @@
-function [r,s,e,ep,em] = findLimitS(sfun, efun, ri, dr, R, phi)
+function [r,s,sp,sm,e,ep,em] = findLimitS(sfun, efun, ri, dr, R, phi)
     global threshold;
     t=sfun(R,0)+phi;
+    sp= sfun(R,0)+phi;
+    sm = sfun(R,0)-phi;
     ep=efun(R,0)+threshold;
     em=efun(R,0)-threshold;
-    skip=0;
-    rtest = ri;
-    while (sign(sfun(rtest,t)) == sign(sfun(R,t)))
-        rtest = rtest+dr;
-        if(rtest >= R) 
-            skip = 1;
-            break;
-        end
-    end
+    r = findZeroPrev(@(r) sfun(r,t),ri,dr,R);
 
-    if (skip~=1)
-        r = fzero(@(r) sfun(r,t),[rtest,R]);
-        s = sfun(r,0);
+    if (~isnan(r))
         e = efun(r,0);
         if ( e > ep )
             e = ep;
-            r = fzero(@(r) efun(r,e),R);
-            s = sfun(r,0);
+            r = findZeroPrev(@(r) efun(r,e),ri,dr,R);
         elseif ( e < em )
             e = em;
-            r = fzero(@(r) efun(r,e),R);
-            s = sfun(r,0);
-        end      
+            r = findZeroPrev(@(r) efun(r,e),ri,dr,R);
+        end   
+        s = sfun(r,0);
     else
-        s = NaN;
-        e = NaN;
-        r = NaN;
-        % TODO
+        rp = findZeroPrev(@(r) efun(r,ep),ri,dr,R);
+        rm = findZeroPrev(@(r) efun(r,em),ri,dr,R);
+        if(isnan(rp))
+            if(isnan(rm))
+                r = NaN;
+            else
+                r = rm;
+            end
+        else
+            if(isnan(rm))
+                r = rp;
+            else
+                if (abs(R-rp) < abs(R-rm))
+                    r = rp;
+                else
+                    r = rm;
+                end
+            end
+        end
+        s = sfun(r,0);
+        e = efun(r,0);
     end
     
 end
