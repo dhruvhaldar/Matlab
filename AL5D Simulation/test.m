@@ -5,7 +5,7 @@ filename = 'testnew51.gif';
 
 global HAND;
 global threshold;
-threshold = 10;
+threshold = 18;
 delta = 8;
 dr = 0.5;
 dh = -1;
