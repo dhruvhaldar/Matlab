@@ -127,6 +127,6 @@ grid on
 % view(0,0)
 view(37.5,30)
 
-pause(0.01);
+pause(0.05);
 
 end
