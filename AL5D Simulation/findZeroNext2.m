@@ -1,9 +1,9 @@
-function r = findZeroNext2(fun,ri,rf,dr,R)
+function r = findZeroNext2(fun,ri,rf,dr)
     skip=0;
     rtest = rf;
     while (sign(fun(rtest)) == sign(fun(rf)))
         rtest = rtest-dr;
-        if(rtest < ri) 
+        if(dr*(rtest - ri) < 0) 
             skip = 1;
             break;
         end

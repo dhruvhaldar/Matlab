@@ -9,14 +9,19 @@ HAND = 90.0;           % wrist to gripper tip
 threshold = 10;
 deltamax = 7.5; % Inaccuracy
 
-basAngle_d = 90;
-shlAngle_d = 90;
-elbAngle_d = 90;
-wriAngle_d = 90;
+basAngle_d = 202.5;
+shlAngle_d = 47.8998;
+elbAngle_d = 42.6840;
+wriAngle_d = 179.4161;
 
-[elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
-
-[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-200, tip_h, handAngle_d);
+% basAngle_d = 90;
+% shlAngle_d = 90;
+% elbAngle_d = 90;
+% wriAngle_d = 90;
+% 
+% [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
+% 
+% [shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-200, tip_h, handAngle_d);
 
 [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 
@@ -24,12 +29,17 @@ ri = wri_r;
 hi = wri_h;
 theta0 = basAngle_d;
 
-dr = 0.5;   
-dh = -1;
-dtheta = 0.5;
-hvec = tip_h:dh:0;
-rvec = tip_r:dr:(wri_r+(length(hvec)-1)*dr);
-thvec = theta0:dtheta:(theta0+(length(hvec)-1)*dtheta);
+dr = -0.5;   
+dh = 1;
+dtheta = -0.5;
+hvec = tip_h:dh:225.05;
+% dr = 0.5;   
+% dh = -1;
+% dtheta = 0.5;
+% hvec = tip_h:dh:0;
+hlen = length(hvec)-1;
+rvec = ri:dr:(ri+hlen*dr);
+thvec = theta0:dtheta:(theta0+hlen*dtheta);
 
 [sfun, efun] = anglefns(ri, hi, dr, dh);
 
@@ -82,38 +92,42 @@ end
 % end
 
 
-% t = linspace(0,1,50);
-% s = linspace(0,1,length(delta))';
-% c = normpdf(s,0.5,0.2);
-% c = c - min(c);
-% c = c./abs(max(c));
-% 
-% C = (ones(size(c))*ones(size(t)))';
+t = linspace(0,1,50);
+s = linspace(0,1,length(elb_x))';
+c = normpdf(s,0.5,0.2);
+c = c - min(c);
+d = 0.8;
+c = d*c./abs(max(c))+1-d;
+
+
+C = (c*ones(size(t)))';
 % 
 % % wr = wrir(1) + s*(wrir(3)-wrir(1));
 % % wz = wriz(1) + s*(wriz(3)-wriz(1));
-% x1 = t'*elb_x;
-% y1 = t'*elb_y;
-% z1 = t'*(elb_z-BASE_HEIGHT)+BASE_HEIGHT;
-% 
-% x2 = t'*(wri_x-elb_x)+ones(size(t'))*elb_x;
-% y2 = t'*(wri_y-elb_y)+ones(size(t'))*elb_y;
-% z2 = t'*(wri_z-elb_z)+ones(size(t'))*elb_z;
-% 
-% x3 = t'*(tip_x-wri_x)+ones(size(t'))*wri_x;
-% y3 = t'*(tip_y-wri_y)+ones(size(t'))*wri_y;
-% z3 = t'*(tip_z-wri_z)+ones(size(t'))*wri_z;
+x1 = t'*elb_x;
+y1 = t'*elb_y;
+z1 = t'*(elb_z-BASE_HEIGHT)+BASE_HEIGHT;
+
+x2 = t'*(wri_x-elb_x)+ones(size(t'))*elb_x;
+y2 = t'*(wri_y-elb_y)+ones(size(t'))*elb_y;
+z2 = t'*(wri_z-elb_z)+ones(size(t'))*elb_z;
+
+x3 = t'*(tip_x-wri_x)+ones(size(t'))*wri_x;
+y3 = t'*(tip_y-wri_y)+ones(size(t'))*wri_y;
+z3 = t'*(tip_z-wri_z)+ones(size(t'))*wri_z;
 
 index = 1;%ceil(length(elb_x)/2);
-index2 = 2;
-plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0], 'r', [0 elb_x(index) wri_x(index) tip_x(index)],[0 elb_y(index) wri_y(index) tip_y(index)],[BASE_HEIGHT elb_z(index) wri_z(index), tip_z(index)],'b', [0 elb_x(index2) wri_x(index2) tip_x(index2)],[0 elb_y(index2) wri_y(index2) tip_y(index2)],[BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)],'b',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
-% hold on
+index2 = numel(elb_x);
+plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0],'r',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 hold on
+plot3( [0 elb_x(index) wri_x(index) tip_x(index)],[0 elb_y(index) wri_y(index) tip_y(index)],[BASE_HEIGHT elb_z(index) wri_z(index), tip_z(index)],'b', [0 elb_x(index2) wri_x(index2) tip_x(index2)],[0 elb_y(index2) wri_y(index2) tip_y(index2)],[BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)],'b','MarkerSize',1,'LineWidth',2);
 % surf(x1, y1, z1);
+% surf(x2, y2, z2);
+% surf(x3, y3, z3);
 % surf(x2, y2, z2, 'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 % surf(x3, y3, z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-% surf(x1,y1,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-% surf(x2,y2,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+% surf(x1,y1,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+% surf(x2,y2,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 % surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 hold off
 shading interp;
@@ -127,6 +141,6 @@ grid on
 % view(0,0)
 view(37.5,30)
 
-pause(0.05);
+pause(0.01);
 
 end

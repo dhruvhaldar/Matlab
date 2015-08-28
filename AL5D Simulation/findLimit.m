@@ -9,7 +9,11 @@ function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
     rum1 = findZeroPrev(@(r) fun1(r,um1),ri,dr,R);
     rlp1 = findZeroPrev(@(r) fun1(r,lp1),ri,dr,R);
     rlm1 = findZeroPrev(@(r) fun1(r,lm1),ri,dr,R);
-    rsort1 = sort([R rup1 rum1 rlp1 rlm1]);
+    if (dr > 0)
+        rsort1 = sort([R rup1 rum1 rlp1 rlm1]);
+    else
+        rsort1 = sort([R rup1 rum1 rlp1 rlm1],1,'descend');
+    end
     rvalues1 = rsort1(cumsum(rsort1==R)==0);
     if (numel(rvalues1) == 1)
         rlims = [ri rvalues1];
@@ -23,7 +27,12 @@ function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
     ru2 = findZeroPrev(@(r) fun2(r,u2),ri,dr,R);
     l2=fun2(R,0)-threshold;
     rl2 = findZeroPrev(@(r) fun2(r,l2),ri,dr,R);
-    rsort2 = sort([R ru2 rl2]);
+    if (dr > 0)
+        rsort2 = sort([R ru2 rl2]);
+    else
+        rsort2 = sort([R ru2 rl2],1,'descend');
+    end
+    
     rvalues2 = rsort2(cumsum(rsort2==R)==0);
     if (numel(rvalues2)>0)
         rlim = rvalues2(end);
@@ -43,25 +52,24 @@ function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
 %     ang1(2) = fun1(rlims(2),0);
 %     ang2(1) = fun2(rlims(1),0);
 %     ang2(2) = fun2(rlims(2),0);
-
-    phi = [threshold-deltamax, threshold+deltamax];
+% 
+    phi = linspace(-deltamax,deltamax,2);
 
     ang1 = zeros(size(phi));
     ang2 = zeros(size(phi));
 
     for i=1:length(phi)
-        ang1(i) = fun1(R,0)+phi(i);
-        if (~isnan(ang1(i)))
-            r = findZeroPrev(@(r) fun1(r,ang1(i)),ri,dr,R);
-            if (~isnan(r))
-                if (dr*(rlim(1)-r) > 0)
-                    r = rlim(1);
-                end
-            end
-            ang1(i) = fun1(r,0)+phi(i);
-            ang2(i) = fun2(r,0)+phi(i);
-        else
-            ang2(i) = NaN;
+        u = fun1(R,0)+threshold+phi(i);
+        l = fun1(R,0)-threshold-phi(i);
+        ru = findZeroPrev(@(r) fun1(r,u),ri,dr,R);
+        rl = findZeroPrev(@(r) fun1(r,l),ri,dr,R);
+        rsort = sort([R, ru, rl, rlims(1)]);
+        rvalues = rsort(cumsum(rsort==R)==0);
+        r = NaN;
+        if (numel(rvalues) > 0 && dr*(rvalues(end)-rlim) >= 0 )
+            r = rvalues(end);
         end
+        ang1(i) = fun1(r,0);
+        ang2(i) = fun2(r,0);
     end
 end
