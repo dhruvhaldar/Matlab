@@ -8,16 +8,18 @@ function [sp1,sm1,sp2,sm2,ep,em,rmo,rm2o,rpo,rp2o,rlims,slims] = findLimitS(sfun
     rsp2 = findZeroPrev(@(r) sfun(r,sp2),ri,dr,R);
     sm2 = sfun(R,0)-threshold-phi;
     rsm2 = findZeroPrev(@(r) sfun(r,sm2),ri,dr,R);
+    rval1 = [R rsp1 rsp2 rsm1 rsm2];
+    rval1 = rval1(~isnan(rval1));
     if (dr > 0)
-        rsort1 = sort([R rsp1 rsp2 rsm1 rsm2]);
+        rval1 = sort(rval1);
     else
-        rsort1 = sort([R rsp1 rsp2 rsm1 rsm2],1,'descend');
+        rval1 = sort(rval1,'descend');
     end
-    rvalues1 = rsort1(cumsum(rsort1==R)==0);
-    if (numel(rvalues1) == 1)
-        rlims = [ri rvalues1];
-    elseif (numel(rvalues1) > 1)
-        rlims = [rvalues1(end-1) rvalues1(end)];
+    rval1 = rval1(cumsum(rval1==R)==0);
+    if (numel(rval1) == 1)
+        rlims = [ri rval1];
+    elseif (numel(rval1) > 1)
+        rlims = [rval1(end-1) rval1(end)];
     else
         rlims = [NaN NaN];
     end
@@ -28,7 +30,11 @@ function [sp1,sm1,sp2,sm2,ep,em,rmo,rm2o,rpo,rp2o,rlims,slims] = findLimitS(sfun
     rpo = rp;
     rp2o = rp2;
     if(abs(rp2o - rpo) < 0.01)
-        rp2o = rf;
+        if (abs(rpo-ri) < abs(rpo-rf))
+            rp2o = rf;
+        else
+            rpo = ri;
+        end
     end
     if (isnan(rpo))
         rpo = ri;
@@ -44,23 +50,35 @@ function [sp1,sm1,sp2,sm2,ep,em,rmo,rm2o,rpo,rp2o,rlims,slims] = findLimitS(sfun
         rmo = rp2o;
     end
     rm2o = rm2;
+    rval2 = [R rp rm rp2 rm2];
+    rval2 = rval2(~isnan(rval2));
     if (dr > 0)
-        rsort2 = sort([R rp rm rp2 rm2]);
+        rval2 = sort(rval2);
     else
-        rsort2 = sort([R rp rm rp2 rm2],1,'descend');
+        rval2 = sort(rval2,'descend');
     end
-    rvalues2 = rsort2(cumsum(rsort2==R)==0);
-    if (numel(rvalues2)>0)
-        rlim = rvalues2(end);
+    rval2 = rval2(cumsum(rval2==R)==0);
+    if (numel(rval2)>0)
+        rlim = rval2(end);
     else
         rlim = ri;
     end
-    
-    if (dr*(rlim-rlims(1) > 0))
-        if (dr*(rlim-rlims(2) < 0))
-            rlims(1) = rlim;
-        else
-            rlims = [NaN NaN];
+
+    if (dr > 0)
+        if(rlim > rlims(1))
+            if (rlim < rlims(2))
+                rlims(1) = rlim;
+            else
+                rlims = [NaN NaN];
+            end
+        end
+    else
+        if(rlim < rlims(1))
+            if (rlim > rlims(2))
+                rlims(1) = rlim;
+            else
+                rlims = [NaN NaN];
+            end
         end
     end
 

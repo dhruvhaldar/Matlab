@@ -1,24 +1,23 @@
-clear; clc;
+function create2dgif(rvec,hvec)
 
 filename = 'testnew512.gif';
 
-global HAND;
-global threshold;
-threshold = 10;
-delta = 8;
-dr = 0.5;
-dh = -1;
-hi = 315.05;
-ri = -12.675;
-% dr = -0.5;
-% dh = 1;
-% hi = 90.05;
-% ri = 99.825;
+% global HAND;
+global deltamax;
+% dr = 0.5;
+% dh = -1;
+% hi = 315.05;
+% ri = -12.675;
+% % dr = -0.5;
+% % dh = 1;
+% % hi = 90.05;
+% % ri = 99.825;
 
 opengl software
-
-hvec = hi:dh:HAND;%315.05
-rvec = ri:dr:(ri+(length(hvec)-1)*dr);
+ri = rvec(1)
+dr = rvec(2)-rvec(1)
+hi = hvec(1)
+dh = hvec(2)-hvec(1)
 % for i = 1:length(rvec)
 %     [a, b, thetavec(i)] = findLimit(ri,hi,dr,dh,rvec(i),0);
 % end
@@ -36,7 +35,7 @@ index = n+offset;
 rf(n) = rvec(index);
 tf(n) = thvec(index);
 ef(n) = evec(index);
-[sp,sm,sp2,sm2,ep,em,rm,rm2,rp,rp2,rlims,slims] = findLimitS(sfun, efun, ri, rvec(end), dr, rf(n), delta);
+[sp,sm,sp2,sm2,ep,em,rm,rm2,rp,rp2,rlims,slims] = findLimitS(sfun, efun, ri, rvec(end), dr, rf(n), deltamax);
 rvec2 = rvec(dr*(rvec - rlims(1)) > 0 & dr*(rvec - rlims(2)) < 0);
 rvec2 = [rlims(1) rvec2 rlims(2)];
 thvec2 = thvec(dr*(rvec - rlims(1)) > 0 & dr*(rvec - rlims(2)) < 0);
@@ -75,13 +74,13 @@ set(gca, ...
   'LineWidth'   , 1         );
 set(gcf,'color','w');
 
-%       drawnow
-%       frame = getframe(1);
-%       im = frame2im(frame);
-%       [imind,cm] = rgb2ind(im,256);
-%       if n == 1;
-%           imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
-%       else
-%           imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
-%       end
+      drawnow
+      frame = getframe(1);
+      im = frame2im(frame);
+      [imind,cm] = rgb2ind(im,256);
+      if n == 1;
+          imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
+      else
+          imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
+      end
 end

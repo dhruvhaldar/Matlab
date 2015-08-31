@@ -9,16 +9,16 @@ HAND = 90.0;           % wrist to gripper tip
 threshold = 10;
 deltamax = 7.5; % Inaccuracy
 
-basAngle_d = 202.5;
-shlAngle_d = 47.8998;
-elbAngle_d = 42.6840;
-wriAngle_d = 179.4161;
+% basAngle_d = 202.5;
+% shlAngle_d = 47.8998;
+% elbAngle_d = 42.6840;
+% wriAngle_d = 179.4161;
 
-% basAngle_d = 90;
-% shlAngle_d = 90;
-% elbAngle_d = 90;
-% wriAngle_d = 90;
-% 
+basAngle_d = 90;
+shlAngle_d = 90;
+elbAngle_d = 90;
+wriAngle_d = 90;
+
 % [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 % 
 % [shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-200, tip_h, handAngle_d);
@@ -29,14 +29,14 @@ ri = wri_r;
 hi = wri_h;
 theta0 = basAngle_d;
 
-dr = -0.5;   
-dh = 1;
-dtheta = -0.5;
-hvec = tip_h:dh:225.05;
-% dr = 0.5;   
-% dh = -1;
-% dtheta = 0.5;
-% hvec = tip_h:dh:0;
+% dr = -0.5;   
+% dh = 1;
+% dtheta = -0.5;
+% hvec = tip_h:dh:225.05;
+dr = 0.5;   
+dh = -1;
+dtheta = 0.5;
+hvec = tip_h:dh:0;
 hlen = length(hvec)-1;
 rvec = ri:dr:(ri+hlen*dr);
 thvec = theta0:dtheta:(theta0+hlen*dtheta);
@@ -70,6 +70,15 @@ phi = threshold + delta;
 % end
 
 [shl, elb] = findLimit(sfun, efun, ri, dr, tip_r0);
+
+% for(z = 2:length(shl))
+%     if(shl(z) == shl(z-1))
+%         
+%         shl(z) = shl(z-1) + 0.2;
+%         elb(z) = elb(z-1) + 0.2;
+%     end
+% end
+summ = sum(diff(shl)==0);
 
 for k=1:length(shl)
     wri = 360-shl(k)-elb(k)+handAngle_d;
@@ -116,31 +125,43 @@ x3 = t'*(tip_x-wri_x)+ones(size(t'))*wri_x;
 y3 = t'*(tip_y-wri_y)+ones(size(t'))*wri_y;
 z3 = t'*(tip_z-wri_z)+ones(size(t'))*wri_z;
 
-index = 1;%ceil(length(elb_x)/2);
+index1 = 1;%ceil(length(elb_x)/2);
 index2 = numel(elb_x);
+D = 0.2;
+armx1 = [0 elb_x(index1) wri_x(index1) tip_x(index1)];
+army1 = [0 elb_y(index1) wri_y(index1) tip_y(index1)];
+armz1 = [BASE_HEIGHT elb_z(index1) wri_z(index1), tip_z(index1)];
+armx2 = [0 elb_x(index2) wri_x(index2) tip_x(index2)];
+army2 = [0 elb_y(index2) wri_y(index2) tip_y(index2)];
+armz2 = [BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)];
+dist = max(sqrt((armx1-armx2).^2+(army1-army2).^2+(armz1-armz2).^2));
+D = 2/dist;
 plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0],'r',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
 hold on
-plot3( [0 elb_x(index) wri_x(index) tip_x(index)],[0 elb_y(index) wri_y(index) tip_y(index)],[BASE_HEIGHT elb_z(index) wri_z(index), tip_z(index)],'b', [0 elb_x(index2) wri_x(index2) tip_x(index2)],[0 elb_y(index2) wri_y(index2) tip_y(index2)],[BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)],'b','MarkerSize',1,'LineWidth',2);
+h = surf([armx2;armx2+D*(armx1-armx2)],[army2;army2+D*(army1-army2)],[armz2;armz2+D*(armz1-armz2)]);
+alpha(h,summ/numel(shl));
 % surf(x1, y1, z1);
 % surf(x2, y2, z2);
 % surf(x3, y3, z3);
 % surf(x2, y2, z2, 'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 % surf(x3, y3, z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-% surf(x1,y1,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-% surf(x2,y2,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-% surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(x1,y1,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(x2,y2,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 hold off
 shading interp;
 colormap([0.3 0.3 1]);
 axis equal
 
-axis([-1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), -1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), 0, 1.1*(BASE_HEIGHT+HUMERUS)])
-
+% axis([-1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), -1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), 0, 1.1*(BASE_HEIGHT+HUMERUS)])
+axis([-1.5*max(rvec), 1.5*max(rvec), -1.5*max(rvec), 1.5*max(rvec), 0, max(hvec)+HAND])
 grid on
 
 % view(0,0)
-view(37.5,30)
+view(10,30)%view(37.5,30)
 
 pause(0.01);
 
 end
+
+create2dgif(rvec,hvec+HAND)
