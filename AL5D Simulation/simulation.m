@@ -43,6 +43,12 @@ thvec = theta0:dtheta:(theta0+hlen*dtheta);
 
 [sfun, efun] = anglefns(ri, hi, dr, dh);
 
+filename = 'testnew513.gif';
+
+hFig = figure(1);
+set(hFig,'units','normalized','outerposition',[0 0 1 1]);
+
+
 for i=2:length(hvec)   
 [shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(rvec(i), hvec(i), handAngle_d);
 
@@ -127,7 +133,6 @@ z3 = t'*(tip_z-wri_z)+ones(size(t'))*wri_z;
 
 index1 = 1;%ceil(length(elb_x)/2);
 index2 = numel(elb_x);
-D = 0.2;
 armx1 = [0 elb_x(index1) wri_x(index1) tip_x(index1)];
 army1 = [0 elb_y(index1) wri_y(index1) tip_y(index1)];
 armz1 = [BASE_HEIGHT elb_z(index1) wri_z(index1), tip_z(index1)];
@@ -135,33 +140,70 @@ armx2 = [0 elb_x(index2) wri_x(index2) tip_x(index2)];
 army2 = [0 elb_y(index2) wri_y(index2) tip_y(index2)];
 armz2 = [BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)];
 dist = max(sqrt((armx1-armx2).^2+(army1-army2).^2+(armz1-armz2).^2));
-D = 2/dist;
-plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0],'r',rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k.','MarkerSize',1,'LineWidth',2);
+D = 5/dist;
+
+h = plot3(rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k--');
 hold on
-h = surf([armx2;armx2+D*(armx1-armx2)],[army2;army2+D*(army1-army2)],[armz2;armz2+D*(armz1-armz2)]);
-alpha(h,summ/numel(shl));
+h(2) = plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0],'r','MarkerSize',1,'LineWidth',2);
+h(3) = surf([armx2;armx2+D*(armx1-armx2)],[army2;army2+D*(army1-army2)],[armz2;armz2+D*(armz1-armz2)]);
+alpha(h(3),summ/numel(shl));
 % surf(x1, y1, z1);
 % surf(x2, y2, z2);
 % surf(x3, y3, z3);
 % surf(x2, y2, z2, 'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 % surf(x3, y3, z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-surf(x1,y1,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-surf(x2,y2,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
-surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+h(4)=surf(x1,y1,z1,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+h(5)=surf(x2,y2,z2,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
+h(6)=surf(x3,y3,z3,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',C);
 hold off
 shading interp;
 colormap([0.3 0.3 1]);
 axis equal
 
+
+title('Robot Arm Collision Simulation','fontweight','bold','fontsize',20)
+xlabel('X (mm)','FontWeight','bold','fontsize',14);
+ylabel('Y (mm)','FontWeight','bold','fontsize',14);
+zlabel('Z (mm)','FontWeight','bold','fontsize',14);
+%legend(h([1 2 3]),'Path of Motion','Anticipated Position','Possible Position After Collision','Location',[0.75 0.85 0.2 .1]);
+
+set(gca, ...
+  'Box'         , 'off'     , ...
+  'TickDir'     , 'out'     , ...
+  'TickLength'  , [.02 .02] , ...
+  'XMinorTick'  , 'on'      , ...
+  'YMinorTick'  , 'on'      , ...
+  'ZMinorTick'  , 'on'      , ...
+  'XColor'      , [.3 .3 .3], ...
+  'YColor'      , [.3 .3 .3], ...
+  'ZColor'      , [.3 .3 .3], ...
+  'LineWidth'   , 1         );
+set(gcf,'color','w');
+
 % axis([-1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), -1.1*(HUMERUS+ULNA+HAND), 1.1*(HUMERUS+ULNA+HAND), 0, 1.1*(BASE_HEIGHT+HUMERUS)])
 axis([-1.5*max(rvec), 1.5*max(rvec), -1.5*max(rvec), 1.5*max(rvec), 0, max(hvec)+HAND])
 grid on
 
-% view(0,0)
-view(10,30)%view(37.5,30)
 
-pause(0.01);
+
+% view(0,0)
+view(15,15)%view(37.5,30)
+
+      drawnow
+      frame = getframe(1);
+      im = frame2im(frame);
+      [imind,cm] = rgb2ind(im,256);
+
+      if i == 1;
+          imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
+      else
+          imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
+      end
+      
+
+
+% pause(0.01);
 
 end
 
-create2dgif(rvec,hvec+HAND)
+% create2dgif(rvec,hvec+HAND)
