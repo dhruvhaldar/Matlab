@@ -1,4 +1,4 @@
-function [sp1,sm1,sp2,sm2,ep,em,ro,rlims,slims] = findLimitS(sfun, efun, ri, rf, dr, R, phi)
+function [sp1,sm1,sp2,sm2,ep,em,rmo,rm2o,rpo,rp2o,rlims,slims] = findLimitS(sfun, efun, ri, rf, dr, R, phi)
     global threshold;
     sp1= sfun(R,0)+threshold+phi;
     rsp1 = findZeroPrev(@(r) sfun(r,sp1),ri,dr,R);
@@ -37,14 +37,14 @@ function [sp1,sm1,sp2,sm2,ep,em,ro,rlims,slims] = findLimitS(sfun, efun, ri, rf,
     rm2o = rm2;
     
     rvalo = [R rpo rmo rp2o rm2o];
-    rvalo = sort(rvalo);
-    rvalo(abs(diff(rvalo))<0.001) = NaN;
+    rvalo(diff(rvalo)==0) = NaN;
     rvalo = rvalo(~isnan(rvalo));
     if (dr > 0)
         rvalo = sort(rvalo);
     else
         rvalo = sort(rvalo,'descend');
     end
+    
     ro = [NaN NaN NaN NaN];
     n = numel(rvalo);
     i = find(rvalo==R);
@@ -54,7 +54,7 @@ function [sp1,sm1,sp2,sm2,ep,em,ro,rlims,slims] = findLimitS(sfun, efun, ri, rf,
                 case 1,
                     ro(1:2) = [ri rvalo(2)];
                 case 2,
-                    ro(1:2) = [rvalo(1) rf];
+                    ro(1:2) = [rvalo(2) rf];
             end
         case 3,
             switch(i)
@@ -68,18 +68,99 @@ function [sp1,sm1,sp2,sm2,ep,em,ro,rlims,slims] = findLimitS(sfun, efun, ri, rf,
         case 4,
             switch(i)
                 case 1,
-                    ro = [ri rvalo(2:4)];
+                    ro = [ri rvalo(2:4)]
                 case 2,
-                    ro = [rvalo([1 3 4]) rf];
+                    ro(1:2) = [rvalo(1) rvalo(3)];
                 case 3,
-                    ro = [ri rvalo([1 2 4])];
-                case 4,
-                    ro = [rvalo(1:3) rf];
-            end
-        case 5
-            ro = rvalo([1:i-1 i+1:end]);
-    end
                     
+            
+    if(numel(rvalo)>1)
+        n = find(rvalo==R);
+        if (n == 1)
+            ro(1)==ri;
+            if(numel(rvalo(2:end)) == 3)
+                ro(2:end) = rvalo(2:end);
+    
+    
+%     if(abs(rp2o-rpo) < 0.001)
+%         if (isnan(rmo) && isnan(rm2o))
+%             rp2o = NaN;
+%         elseif (isnan(rmo))
+%             rpo = NaN;
+%         elseif (isnan(rm2o))
+%             rp2o = NaN;
+%         else
+%             if (dr*(rp2o-rmo))
+%                 rpo = ri;
+%             else
+%                 rp2o = rf;
+%             end
+%         end
+%     end
+%     
+%     if(abs(rm2o-rmo) < 0.001)
+%         if (isnan(rpo) && isnan(rp2o))
+%             rm2o = NaN;
+%         elseif (isnan(rpo))
+%             rmo = NaN;
+%         elseif (isnan(rp2o))
+%             rm2o = NaN;
+%         else
+%             if (dr*(rm2o-rpo))
+%                 rmo = ri;
+%             else
+%                 rm2o = rf;
+%             end
+%         end
+%     end
+%     
+%     if (xor(isnan(rmo),isnan(rpo)))
+%         if(isnan(rmo))
+%             rmo = ri;
+%         else
+%             rpo = ri;
+%         end
+%     end
+%     
+%     if (xor(isnan(rm2o),isnan(rp2o)))
+%         if(isnan(rm2o))
+%             rm2o = rf;
+%         else
+%             rp2o = rf;
+%         end
+%     end
+    
+    [rpo rmo rp2o rm2o]
+%     if(abs(rp2o - rpo) < 0.01)
+%         if (abs(rpo-ri) < abs(rpo-rf))
+%             rp2o = rf;
+%         else
+%             rpo = ri;
+%         end
+%     end
+%     if (isnan(rpo))
+%         rpo = ri;
+%     end
+%     if (isnan(rp2o))
+%         rp2o = rf;
+%     end
+    
+%     if(abs(rm2o - rmo) < 0.01)
+%         if (abs(rmo-ri) < abs(rmo-rf))
+%             rm2o = rf;
+%         else
+%             rmo = ri;
+%         end
+%     end
+%     if (isnan(rmo))
+%         rmo = ri;
+%     end
+%     if (isnan(rm2o))
+%         rm2o = rf;
+%     end
+%     if (isnan(rmo))
+%         rmo = rp2o;
+%     end
     rval2 = [R rp rm rp2 rm2];
     rval2 = rval2(~isnan(rval2));
     if (dr > 0)
