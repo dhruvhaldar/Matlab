@@ -67,7 +67,7 @@ function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
 %     ang2(1) = fun2(rlims(1),0);
 %     ang2(2) = fun2(rlims(2),0);
 % 
-    phi = linspace(-deltamax,deltamax,10);
+    phi = linspace(-deltamax,deltamax,50);
 
     ang1 = zeros(size(phi));
     ang2 = zeros(size(phi));

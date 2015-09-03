@@ -63,7 +63,7 @@ function [sp1,sm1,sp2,sm2,ep,em,ro,rlims,slims] = findLimitS(sfun, efun, ri, rf,
                 case 2,
                     ro(1:2) = rvalo([1 3]);
                 case 3,
-                    ro(1:2) = [ri rvalo(1:2) rf];
+                    ro = [ri rvalo(1:2) rf];
             end
         case 4,
             switch(i)
