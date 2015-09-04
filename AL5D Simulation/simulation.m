@@ -9,19 +9,19 @@ HAND = 90.0;           % wrist to gripper tip
 threshold = 10;
 deltamax = 7.5; % Inaccuracy
 
-basAngle_d = 202.5;
-shlAngle_d = 47.8998;
-elbAngle_d = 42.6840;
-wriAngle_d = 179.4161;
+% basAngle_d = 202.5;
+% shlAngle_d = 47.8998;
+% elbAngle_d = 42.6840;
+% wriAngle_d = 179.4161;
 
-% basAngle_d = 90;
-% shlAngle_d = 90;
-% elbAngle_d = 90;
-% wriAngle_d = 90;
+basAngle_d = 90;
+shlAngle_d = 90;
+elbAngle_d = 90;
+wriAngle_d = 90;
 
-% [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
-% 
-% [shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-200, tip_h, handAngle_d);
+[elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
+
+[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-100, tip_h, handAngle_d);
 
 [elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
 
@@ -29,21 +29,21 @@ ri = wri_r;
 hi = wri_h;
 theta0 = basAngle_d;
 
-dr = -0.5;   
-dh = 1;
-dtheta = -0.5;
-hvec = tip_h:dh:225.05;
-% dr = 0.5;   
-% dh = -1;
-% dtheta = 0.5;
-% hvec = tip_h:dh:0;
+% dr = -0.5;   
+% dh = 1;
+% dtheta = -0.5;
+% hvec = tip_h:dh:225.05;
+dr = 0.5;   
+dh = -1;
+dtheta = 0.5;
+hvec = tip_h:dh:0;
 hlen = length(hvec)-1;
 rvec = ri:dr:(ri+hlen*dr);
 thvec = theta0:dtheta:(theta0+hlen*dtheta);
 
 [sfun, efun] = anglefns(ri, hi, dr, dh);
 
-filename = '3dfig03.gif';
+filename = '3dfig04.gif';
 
 hFig = figure(1);
 set(hFig,'units','normalized','outerposition',[0 0 1 1]);
@@ -142,7 +142,7 @@ armz2 = [BASE_HEIGHT elb_z(index2) wri_z(index2), tip_z(index2)];
 dist = max(sqrt((armx1-armx2).^2+(army1-army2).^2+(armz1-armz2).^2));
 D = 5/dist;
 
-h = plot3(rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k--');
+%h = plot3(rvec.*sind(thvec),rvec.*cosd(thvec),hvec+HAND,'k--');
 hold on
 h(2) = plot3([0, 0, elb_x0, wri_x0, tip_x0],[0, 0, elb_y0, wri_y0, tip_y0],[0, BASE_HEIGHT, elb_z0, wri_z0, tip_z0],'r','MarkerSize',1,'LineWidth',2);
 h(3) = surf([armx2;armx2+D*(armx1-armx2)],[army2;army2+D*(army1-army2)],[armz2;armz2+D*(armz1-armz2)]);
@@ -165,7 +165,7 @@ title('Robot Arm Collision Simulation','fontweight','bold','fontsize',20)
 xlabel('X (mm)','FontWeight','bold','fontsize',14);
 ylabel('Y (mm)','FontWeight','bold','fontsize',14);
 zlabel('Z (mm)','FontWeight','bold','fontsize',14);
-legend(h([1 2 3]),'Path of Motion','Anticipated Position','Possible Position After Collision','Location',[0.75 0.85 0.2 .1]);
+%legend(h([1 2 3]),'Path of Motion','Anticipated Position','Possible Position After Collision','Location',[0.75 0.85 0.2 .1]);
 
 set(gca, ...
   'Box'         , 'off'     , ...
@@ -188,18 +188,18 @@ grid on
 
 % view(0,0)
 %view(15,15)
-view(-37.5,30)
+view(37.5,30)
 
-      drawnow
-      frame = getframe(1);
-      im = frame2im(frame);
-      [imind,cm] = rgb2ind(im,256);
-
-      if i == 2;
-          imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
-      else
-          imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
-      end
+%       drawnow
+%       frame = getframe(1);
+%       im = frame2im(frame);
+%       [imind,cm] = rgb2ind(im,256);
+% 
+%       if i == 2;
+%           imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
+%       else
+%           imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
+%       end
       
 
 
@@ -207,4 +207,4 @@ view(-37.5,30)
 
 end
 close
-create2dgif(rvec,hvec+HAND)
+% create2dgif(rvec,hvec+HAND)
