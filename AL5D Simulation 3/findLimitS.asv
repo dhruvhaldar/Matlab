@@ -1,4 +1,4 @@
-function [sp,sm,ep,em,ro,rlim,slim] = findLimitS(sfun, efun, ri, rf, dr, R)
+function [sp,sm,ep,em,ro,rlim,slims] = findLimitS(sfun, efun, ri, rf, dr, R)
     global threshold;
     sp= sfun(R,0)+2*threshold;
     rsp = findZeroPrev(@(r) sfun(r,sp),ri,dr,R);
@@ -92,6 +92,23 @@ function [sp,sm,ep,em,ro,rlim,slim] = findLimitS(sfun, efun, ri, rf, dr, R)
         rlim = rlim1;
     else
         rlim = rlim2;
+    end
+    if (dr > 0)
+        if(rlim > rlim(1))
+            if (rlim < rlim(2))
+                rlim(1) = rlim;
+            else
+                rlim = [NaN NaN];
+            end
+        end
+    else
+        if(rlim < rlim(1))
+            if (rlim > rlim(2))
+                rlim(1) = rlim;
+            else
+                rlim = [NaN NaN];
+            end
+        end
     end
 
     slim = sfun(rlim,0);
