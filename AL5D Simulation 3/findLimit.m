@@ -1,15 +1,10 @@
 function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
-    global threshold deltamax;
-    
-    up1=fun1(R,0)+threshold+deltamax;
-    um1=fun1(R,0)+threshold-deltamax;
-    lp1=fun1(R,0)-threshold+deltamax;
-    lm1=fun1(R,0)-threshold-deltamax;
-    rup1 = findZeroPrev(@(r) fun1(r,up1),ri,dr,R);
-    rum1 = findZeroPrev(@(r) fun1(r,um1),ri,dr,R);
-    rlp1 = findZeroPrev(@(r) fun1(r,lp1),ri,dr,R);
-    rlm1 = findZeroPrev(@(r) fun1(r,lm1),ri,dr,R);
-    rval1 = [R rup1 rum1 rlp1 rlm1];
+    global threshold;
+    u1=fun1(R,0)+2*threshold;
+    l1=fun1(R,0)-2*threshold;
+    ru1 = findZeroPrev(@(r) fun1(r,u1),ri,dr,R);
+    rl1 = findZeroPrev(@(r) fun1(r,l1),ri,dr,R);
+    rval1 = [R ru1 ru1];
     rval1 = rval1(~isnan(rval1));
     if (dr > 0)
         rval1 = sort(rval1);
@@ -17,17 +12,15 @@ function [ang1,ang2] = findLimit(fun1, fun2, ri, dr, R)
         rval1 = sort(rval1,'descend');
     end
     rval1 = rval1(cumsum(rval1==R)==0);
-    if (numel(rval1) == 1)
-        rlims = [ri rval1];
-    elseif (numel(rval1) > 1)
-        rlims = [rval1(end-1) rval1(end)];
+    if (numel(rval1) > 0)
+        rlim1 = rval1;
     else
-        rlims = [NaN NaN];
+        rlim1 = ri;
     end
     
-    u2=fun2(R,0)+threshold;
+    u2=fun2(R,0)+2*threshold;
     ru2 = findZeroPrev(@(r) fun2(r,u2),ri,dr,R);
-    l2=fun2(R,0)-threshold;
+    l2=fun2(R,0)-2*threshold;
     rl2 = findZeroPrev(@(r) fun2(r,l2),ri,dr,R);
     rval2 = [R ru2 rl2];
     rval2 = rval2(~isnan(rval2));
