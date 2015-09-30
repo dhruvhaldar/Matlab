@@ -1,0 +1,19 @@
+yaw1 = 45;
+d = 10;
+yaw2 = yaw1-d:1:yaw1+d;
+yaw2 = yaw2';
+pitch1 = yaw1;
+pitch2 = pitch1-d:1:pitch1+d;
+ux = cosd(yaw2)*cosd(pitch2);
+uy = cosd(yaw2)*sind(pitch2);
+uz = ones(size(yaw2))*sind(pitch2);
+u = [ux(:)'; uy(:)'; uz(:)'];
+v = zeros(size(u));
+plot3
+
+c = acosd(cosd(yaw1-yaw2)*cosd(pitch1)*cosd(pitch2)+ones(size(yaw2))*sind(pitch1)*sind(pitch2));
+plot3(ux,uy,uz)
+% mesh(pitch2-pitch1,yaw2-yaw1,c)
+% xlabel('Pitch Disparity (Degrees)')
+% ylabel('Yaw Disparity (Degrees)')
+% zlabel('Total Disparity (Degrees)')
