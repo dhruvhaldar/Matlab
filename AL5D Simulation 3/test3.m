@@ -25,7 +25,7 @@ c = c./max(max(c));
 
 
 plot3([0 vx], [0 vy], [0 vz]);
-hold on
+hold on 
 surf(ux,uy,uz,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',c)
 shading interp;
 colormap([0 0 1]);
