@@ -1,6 +1,6 @@
 function create2dgif(rvec,hvec)
 
-% filename = '2dfig04.gif';
+%filename = '2dfig04.gif';
 
 % global HAND;
 global deltamax;

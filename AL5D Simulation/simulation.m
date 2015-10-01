@@ -41,8 +41,8 @@ hlen = length(hvec)-1;
 rvec = ri:dr:(ri+hlen*dr);
 thvec = theta0:dtheta:(theta0+hlen*dtheta);
 
-[sfun, efun] = anglefns(ri, hi, dr, dh);
-
+% [sfun, efun] = anglefns(ri, hi, dr, dh);
+% 
 % filename = '3dfig04.gif';
 % 
 % hFig = figure(1);
