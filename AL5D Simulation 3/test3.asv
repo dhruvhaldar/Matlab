@@ -1,15 +1,16 @@
 clear;
 clc;
 
-stdy = 3.33;
-stdp = 3.33;
+stdy = 5;
+stdp = 5;
 
 yaw1 = 45;
-lim = 3; %stds
-stepsize = 500;
-yaw2 = linspace(yaw1-lim*stdy,yaw1+lim*stdy,stepsize);
-pitch1 = 45;
-pitch2 = linspace(pitch1-lim*stdp,pitch1+lim*stdp,stepsize);
+lim = 3;
+dd = 500;
+yaw2 = linspace(yaw1-d,yaw1+d,dd);
+yaw2 = yaw2;
+pitch1 = yaw1;
+pitch2 = linspace(pitch1-d,pitch1+d,dd);
 pitch2 = pitch2';
 ux = cosd(pitch2)*cosd(yaw2);
 uy = cosd(pitch2)*sind(yaw2);
@@ -26,11 +27,17 @@ c = c./max(max(c));
 
 plot3([0 vx], [0 vy], [0 vz]);
 hold on
-surf(ux,uy,uz,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',c)
+surf(ux,uy,uz,c,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',c)
 shading interp;
 colormap([0 0 1]);
-axis([0 1 0 1 0 1])
+% n = 100;
+% vector = normpdf(linspace(0,1.5,n),0,1);
+% vector = vector-min(vector);
+% vector = vector./max(vector)
+% map = [vector', vector', ones(n,1)];
+% colormap(map);
 % mesh(pitch2-pitch1,yaw2-yaw1,c)
 % xlabel('Pitch Disparity (Degrees)')
 % ylabel('Yaw Disparity (Degrees)')
 % zlabel('Total Disparity (Degrees)')
+axis([0 1 0 1 0 1])
