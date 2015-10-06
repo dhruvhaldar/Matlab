@@ -17,31 +17,58 @@ deltamax = 7.5; % Inaccuracy
 basAngle_d = 90;
 shlAngle_d = 90;
 elbAngle_d = 90;
-wriAngle_d = 90;
+handAngle_d = -90;
 
-[elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
+[~, ~, tip] = forwardsKinematics(basAngle_d, shlAngle_d, elbAngle_d, handAngle_d );
 
-[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(tip_r-100, tip_h, handAngle_d);
+[shlAngle_d, elbAngle_d, wriAngle_d] = inverseKinematics(sqrt(tip(1)^2+tip(2)^2)-100, tip(3), handAngle_d);
 
-[elb_r, elb_h, wri_r, wri_h, tip_r, tip_h, handAngle_d] = forwardsKinematics(shlAngle_d, elbAngle_d, wriAngle_d);
+[~, ~, tip] = forwardsKinematics(basAngle_d, shlAngle_d, elbAngle_d, handAngle_d );
 
-ri = wri_r;
-hi = wri_h;
-theta0 = basAngle_d;
+% ri = wri_r;
+% hi = wri_h;
+% theta0 = basAngle_d;
 
 % dr = -0.5;   
 % dh = 1;
 % dtheta = -0.5;
 % hvec = tip_h:dh:225.05;
-dr = 0.5;   
-dh = -1;
-dtheta = 0.5;
-hvec = tip_h:dh:0;
-hlen = length(hvec)-1;
-rvec = ri:dr:(ri+hlen*dr);
-thvec = theta0:dtheta:(theta0+hlen*dtheta);
+% dr = 0.5;   
+% dh = -1;
+% dtheta = 0.5;
+% hvec = tip_h:dh:0;
+% hlen = length(hvec)-1;
+% rvec = ri:dr:(ri+hlen*dr);
+% thvec = theta0:dtheta:(theta0+hlen*dtheta);
+bas = [0, 0, 0];
+shl = [0, 0, BASE_HEIGHT];
+tip_r = sqrt(tip(1)^2+tip(2)^2);
 
-[sfun, efun] = anglefns(ri, hi, dr, dh);
+pos1 = [tip_r, basAngle_d, tip(3), handAngle_d];
+pos2 = [tip_r+100,180,0,handAngle_d];
+duration = 100;
+tvec = 0:duration; 
+
+[rfn, afn, zfn, dfn, sfn, efn, wfn] = anglefns(pos1, pos2, duration);
+
+[elb, wri, tip] = forwardsKinematics(afn(tvec), sfn(tvec,0), efn(tvec,0), dfn(tvec));
+
+% for i = 1:length(tvec)
+%     plot3([bas(1) shl(1) elb(1,i) wri(1,i) tip(1,i)],[bas(2) shl(2) elb(2,i) wri(2,i) tip(2,i)],[bas(3) shl(3) elb(3,i) wri(3,i) tip(3,i)])
+%     axis([-500, 500, -500, 500, 0, 500])
+%     view(37.5,30)
+% 
+%     xlabel('x');
+%     ylabel('y');
+%     zlabel('z');
+%     pause(0.02)
+% end
+    
+
+% plot3(elb(1,:),elb(2,:),elb(3,:),wri(1,:),wri(2,:),wri(3,:))
+
+% plot(tvec,efn(tvec,0),tvec,sfn(tvec,0),tvec,wfn(tvec,0,0))
+% legend('e','s','w')
 
 % filename = '3dfig04.gif';
 % 
@@ -66,7 +93,7 @@ thvec = theta0:dtheta:(theta0+hlen*dtheta);
 % 
 % 
 % % for k=1:length(phi)
-% %     [shl, elb] = findLimit(sfun, efun, phi(k), ri, dr, tip_r0);
+% %     [shl, elb] = findLimit(sfn, efn, phi(k), ri, dr, tip_r0);
 % %     wri = 360-shl-elb+handAngle_d;
 % %     [elb_r, elb_z(k), wri_r, wri_z(k), tip_r, tip_z(k), handAngle_d] = forwardsKinematics(shl, elb, wri);
 % %     theta = dtheta*((tip_r-ri)/dr)+theta0;
@@ -75,7 +102,7 @@ thvec = theta0:dtheta:(theta0+hlen*dtheta);
 % %     tip_x(k) = tip_r*sind(theta); tip_y(k) = tip_r*cosd(theta);
 % % end
 % 
-% [shl, elb] = findLimit(sfun, efun, ri, dr, tip_r0);
+% [shl, elb] = findLimit(sfn, efn, ri, dr, tip_r0);
 % 
 % % for(z = 2:length(shl))
 % %     if(shl(z) == shl(z-1))
@@ -207,4 +234,5 @@ thvec = theta0:dtheta:(theta0+hlen*dtheta);
 % 
 % end
 % close
-create2dgif(rvec,hvec+HAND,thvec)
+
+create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, tvec)

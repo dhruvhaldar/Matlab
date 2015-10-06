@@ -1,4 +1,4 @@
-function create2dgif(rvec,hvec,thvec)
+function create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, tvec)
 
 % filename = '2dfig04.gif';
 
@@ -14,36 +14,36 @@ global deltamax;
 % % ri = 99.825;
 
 opengl software
-ri = rvec(1);
-dr = rvec(2)-rvec(1);
-hi = hvec(1);
-dh = hvec(2)-hvec(1);
+% ri = rvec(1);
+% dr = rvec(2)-rvec(1);
+% hi = hvec(1);
+% dh = hvec(2)-hvec(1);
 % for i = 1:length(rvec)
 %     [a, b, thetavec(i)] = findLimit(ri,hi,dr,dh,rvec(i),0);
 % end
-[sfun, efun] = anglefns(ri, hi, dr, dh);
+% [sfun, efun] = anglefns(ri, hi, dr, dh);
 
-for i = 1:length(rvec)
-    svec(i) = sfun(rvec(i),0);
-    evec(i) = efun(rvec(i),0);
-end
-nmax = numel(rvec);
+% for i = 1:length(rvec)
+%     svec(i) = sfun(rvec(i),0);
+%     evec(i) = efun(rvec(i),0);
+% end
+nmax = numel(tvec);
 offset = 0;
 for n=1:nmax
 clear rvec2 thvec2
 index = n+offset;
-rf(n) = rvec(index);
-sf(n) = svec(index);
-ef(n) = evec(index);
-[sp,sm,rlim,slim] = findLimitS(sfun, ri, dr, rf(n));
-rvec2 = rvec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
-rvec2 = [rlim rvec2 rf(n)];
-thvec2 = svec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
-thvec2 = [slim thvec2 sf(n)];
-pause(0.02);
+delta = @(t,C) acos(cos(sfn(t) - sfn(tvec(index)))*cos(afn(tvec(index)))*cos(afn(t))+sin(afn(tvec(index)))*sin(afn(t)))-C;
+fzero(@(t)delta(t,10))
+% [sp,sm,rlim,slim] = findLimitS(sfun, ri, dr, rf(n));
+% rvec2 = rvec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
+% rvec2 = [rlim rvec2 rf(n)];
+% thvec2 = svec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
+% thvec2 = [slim thvec2 sf(n)];
 hFig = figure(1);
 set(hFig, 'Position', [100 100 1000 700])
-h = plot(rvec,thvec,'k',rvec,svec,'b',rvec,evec,'r',rf(n),sf(n),'b*',rf(n),ef(n),'r*',[rvec(n) rvec(n)],[0 200],'c:',rvec2,thvec2,'g');
+plot(tvec,afn(tvec),'b',tvec,sfn(tvec,0),'r',tvec(index),afn(tvec(index)),'b*',tvec(index),sfn(tvec(index),0),'r*');
+pause(0.02);
+%h = plot(rvec,thvec,'k',rvec,svec,'b',rvec,evec,'r',rf(n),sf(n),'b*',rf(n),ef(n),'r*',[rvec(n) rvec(n)],[0 200],'c:',rvec2,thvec2,'g');
 % plot(r2,e2,'r*',r2,ep2,'g*',r2,em2,'b*');
 % h = plot3(rvec,thvec,zeros(size(thvec)))
 % 

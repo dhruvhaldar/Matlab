@@ -1,11 +1,15 @@
-function [sfun, efun] = anglefns(ri, hi, dr, dh)
+function [rfn, afn, zfn, dfn, sfn, efn, wfn] = anglefns(pos1, pos2, duration)
     global BASE_HEIGHT HUMERUS ULNA;
-    h = @(r)(dh/dr)*(r-ri)+hi;
-    s2w_r = @(r)r;
-    s2w_h = @(r)h(r)-BASE_HEIGHT;
-    s2w = @(r)( s2w_h(r) * s2w_h(r) ) + ( s2w_r(r) * s2w_r(r) ); % (Length of line from shoulder to wrist (S-W))^2
-    a1 = @(r) atan2( s2w_h(r),s2w_r(r) ); % Angle between S-W line and ground
-    a2 = @(r) acos((( HUMERUS^2 - ULNA^2 ) + s2w(r) ) / ( 2 * HUMERUS * sqrt( s2w(r) ) )); % Angle between S-W line and humerus
-    efun = @(r,C) acosd(( HUMERUS^2 + ULNA^2 - s2w(r) ) / ( 2 * HUMERUS * ULNA )) - C; % Angle between humerus and ulna
-    sfun = @(r,C) radtodeg(a1(r)+a2(r))-C;
+    rfn = @(t) (pos2(1)-pos1(1))*t/duration + pos1(1);
+    afn = @(t) (pos2(2)-pos1(2))*t/duration + pos1(2);
+    zfn = @(t) (pos2(3)-pos1(3))*t/duration + pos1(3);
+    dfn = @(t) (pos2(4)-pos1(4))*t/duration + pos1(4);
+    s2w_r = @(t)rfn(t);
+    s2w_h = @(t)zfn(t)-BASE_HEIGHT;
+    s2w = @(t)( s2w_h(t) .* s2w_h(t) ) + ( s2w_r(t) .* s2w_r(t) ); % (Length of line from shoulder to wrist (S-W))^2
+    a1 = @(t) atan2( s2w_h(t),s2w_r(t) ); % Angle between S-W line and ground
+    a2 = @(t) acos((( HUMERUS^2 - ULNA^2 ) + s2w(t) ) ./ ( 2 * HUMERUS * sqrt( s2w(t) ) )); % Angle between S-W line and humerus
+    sfn = @(t,C) radtodeg(a1(t)+a2(t))-C;
+    efn = @(t,C) acosd(( HUMERUS^2 + ULNA^2 - s2w(t) ) ./ ( 2 * HUMERUS * ULNA )) - C; % Angle between humerus and ulna
+    wfn = @(t,Ce,Cs) 360-sfn(t,Ce)-efn(t,Cs)+dfn(t);
 end
