@@ -1,17 +1,17 @@
-function r = findZeroPrev(fun,ri,dr,R)
-    skip=0;
-    rtest = R;
-    while (sign(fun(rtest)) == sign(fun(R)))
-        rtest = rtest-dr;
-        if(dr*(rtest-ri) < 0 ) 
+function t = findZeroPrev(fun,tvec,index)
+    n = index;
+    skip = 0;
+    while (sign(fun(tvec(n))) == sign(fun(tvec(index))))
+        n = n - 1;
+        if(n < 1 ) 
             skip = 1;
             break;
         end
     end
     
     if (skip~=1)
-        r = fzero(fun,[rtest,R]);    
+        t = fzero(fun,[tvec(n),tvec(index)]);    
     else
-        r = NaN;
+        t = tvec(1);
     end
 end
