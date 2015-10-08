@@ -1,4 +1,4 @@
-function [rfn, afn, zfn, dfn, sfn, efn, wfn] = anglefns(pos1, pos2, duration)
+function [rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn] = anglefns(pos1, pos2, duration)
     global BASE_HEIGHT HUMERUS ULNA;
     rfn = @(t) (pos2(1)-pos1(1))*t/duration + pos1(1);
     afn = @(t) (pos2(2)-pos1(2))*t/duration + pos1(2);
@@ -12,4 +12,5 @@ function [rfn, afn, zfn, dfn, sfn, efn, wfn] = anglefns(pos1, pos2, duration)
     sfn = @(t,C) radtodeg(a1(t)+a2(t))-C;
     efn = @(t,C) acosd(( HUMERUS^2 + ULNA^2 - s2w(t) ) ./ ( 2 * HUMERUS * ULNA )) - C; % Angle between humerus and ulna
     wfn = @(t,Ce,Cs) 360-sfn(t,Ce)-efn(t,Cs)+dfn(t);
+    deltafn = @(t,ti,C) real(acosd(cosd(afn(t) - afn(ti)).*cosd(sfn(ti,0)).*cosd(sfn(t,0))+sind(sfn(ti,0)).*sind(sfn(t,0)))-C);
 end

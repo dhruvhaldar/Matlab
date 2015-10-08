@@ -1,17 +1,17 @@
-function t = findZeroPrev(fun,tvec,index)
-    n = index;
+function t = findZeroPrev(fun,ti)
+    t = ti-1;
     skip = 0;
-    while (sign(fun(tvec(n))) == sign(fun(tvec(index))))
-        n = n - 1;
-        if(n < 1 ) 
+    while (sign(fun(t)) == sign(fun(ti)))
+        t = t - 1;
+        if(t < 0 ) 
             skip = 1;
             break;
         end
     end
     
     if (skip~=1)
-        t = fzero(fun,[tvec(n),tvec(index)]);    
+        t = fzero(fun,[t,ti]);    
     else
-        t = tvec(1);
+        t = 0;
     end
 end

@@ -45,18 +45,36 @@ shl = [0, 0, BASE_HEIGHT];
 tip_r = sqrt(tip(1)^2+tip(2)^2);
 
 pos1 = [tip_r, basAngle_d, tip(3), handAngle_d];
-pos2 = [tip_r,180,tip(3),handAngle_d];
+pos2 = [tip_r+100,180,0,handAngle_d];
 duration = 100;
 tvec = 0:duration; 
 
-[rfn, afn, zfn, dfn, sfn, efn, wfn] = anglefns(pos1, pos2, duration);
+[rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn] = anglefns(pos1, pos2, duration);
 
 [elb, wri, tip] = forwardsKinematics(afn(tvec), sfn(tvec,0), efn(tvec,0), dfn(tvec));
 
 for i = 1:length(tvec)
-    delta = @(t,C) real(acosd(cosd(afn(t) - afn(tvec(i))).*cosd(sfn(tvec(i),0)).*cosd(sfn(t,0))+sind(sfn(tvec(i),0)).*sind(sfn(t,0)))-C);
-    t = findZeroPrev(@(t)delta(t,10),tvec,i);
-    [elb2, wri2, tip2] = forwardsKinematics(afn(t), sfn(t,0), efn(t,0), dfn(t));
+    t1 = findZeroPrev(@(t)deltafn(t,tvec(i),10),tvec(i));
+    t2 = findZeroPrev(@(t)deltafn(t,t1,10),t1);
+    tvec2 = linspace(t2,tvec(i));
+    avec = afn(tvec2);
+    svec = sfn(tvec2,0)';
+    a = afn(t1);
+    s = sfn(t1,0);
+    [elb2, wri2, tip2] = forwardsKinematics(a, s, efn(t1,0), dfn(t1));
+    stda = 3.33;
+    stds = 3.33;
+    lim = 3;
+    stepsize = 500;
+%     avec = linspace(a-lim*stda,a+lim*stda,stepsize);
+%     svec = linspace(s-lim*stds,s+lim*stds,stepsize)';
+    ux = HUMERUS*cosd(svec)*sind(avec);
+    uy = HUMERUS*cosd(svec)*cosd(avec);
+    uz = HUMERUS*sind(svec)*ones(size(avec))+BASE_HEIGHT;
+    c = normpdf(svec,s,stds)*normpdf(avec,a,stda);
+    c = c./max(max(c));
+    
+    
     plot3([bas(1) shl(1) elb(1,i) wri(1,i) tip(1,i)],[bas(2) shl(2) elb(2,i) wri(2,i) tip(2,i)],[bas(3) shl(3) elb(3,i) wri(3,i) tip(3,i)],'b',[bas(1) shl(1) elb2(1) wri2(1) tip2(1)],[bas(2) shl(2) elb2(2) wri2(2) tip2(2)],[bas(3) shl(3) elb2(3) wri2(3) tip2(3)],'r');
     axis([-500, 500, -500, 500, 0, 500])
     view(37.5,30)
@@ -64,6 +82,11 @@ for i = 1:length(tvec)
     xlabel('x');
     ylabel('y');
     zlabel('z');
+    hold on
+    surf(ux,uy,uz,'FaceAlpha','flat','AlphaDataMapping','none','AlphaData',c)
+    shading interp;
+    colormap([1 0 0]);
+    hold off
     pause(0.02)
 end
     
@@ -238,4 +261,4 @@ end
 % end
 % close
 
-% create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, tvec)
+% create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn, tvec)

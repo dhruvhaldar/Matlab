@@ -1,5 +1,4 @@
-function create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, tvec)
-
+function create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn, tvec)
 % filename = '2dfig04.gif';
 
 % global HAND;
@@ -32,11 +31,7 @@ offset = 0;
 for n=1:nmax
 clear rvec2 thvec2
 index = n+offset;
-s = sfn(tvec(index),0);
-a = afn(tvec(index));
-delta = @(t,C) real(acosd(cosd(afn(t) - afn(tvec(index))).*cosd(sfn(tvec(index),0)).*cosd(sfn(t,0))+sind(sfn(tvec(index),0)).*sind(sfn(t,0)))-C);
-
-tt = findZeroPrev(@(t)delta(t,10),tvec,index);
+tt = findZeroPrev(@(t)deltafn(t,tvec(index),10),tvec,index);
 % [sp,sm,rlim,slim] = findLimitS(sfun, ri, dr, rf(n));
 % rvec2 = rvec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
 % rvec2 = [rlim rvec2 rf(n)];
@@ -46,7 +41,7 @@ hFig = figure(1);
 set(hFig, 'Position', [100 100 1000 700])
 plot(tvec,afn(tvec),'b',tvec,sfn(tvec,0),'r',tvec(index),afn(tvec(index)),'b*',tvec(index),sfn(tvec(index),0),'r*');
 hold on
-plot(tvec,delta(tvec,10));
+plot(tvec,deltafn(tvec,tvec(index),10));
 plot(tt,afn(tt),'c*',tt,sfn(tt,0),'m*');
 hold off
 pause(0.02);
