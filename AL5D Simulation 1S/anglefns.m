@@ -1,11 +1,11 @@
 function [rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn] = anglefns(pos1, pos2, duration)
-    global BASE_HEIGHT HUMERUS ULNA;
+    global BASE_HEIGHT HUMERUS ULNA HAND;
     rfn = @(t) (pos2(1)-pos1(1))*t/duration + pos1(1);
     afn = @(t) (pos2(2)-pos1(2))*t/duration + pos1(2);
     zfn = @(t) (pos2(3)-pos1(3))*t/duration + pos1(3);
     dfn = @(t) (pos2(4)-pos1(4))*t/duration + pos1(4);
-    s2w_r = @(t)rfn(t);
-    s2w_h = @(t)zfn(t)-BASE_HEIGHT;
+    s2w_r = @(t)rfn(t)-HAND*cosd(dfn(t));
+    s2w_h = @(t)zfn(t)-BASE_HEIGHT-HAND*sind(dfn(t));
     s2w = @(t)( s2w_h(t) .* s2w_h(t) ) + ( s2w_r(t) .* s2w_r(t) ); % (Length of line from shoulder to wrist (S-W))^2
     a1 = @(t) atan2( s2w_h(t),s2w_r(t) ); % Angle between S-W line and ground
     a2 = @(t) acos((( HUMERUS^2 - ULNA^2 ) + s2w(t) ) ./ ( 2 * HUMERUS * sqrt( s2w(t) ) )); % Angle between S-W line and humerus
