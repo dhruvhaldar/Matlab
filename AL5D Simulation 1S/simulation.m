@@ -47,7 +47,7 @@ tip_r = sqrt(tip(1)^2+tip(2)^2);
 plot3([bas(1) shl(1) elb(1) wri(1) tip(1)],[bas(2) shl(2) elb(2) wri(2) tip(2)],[bas(3) shl(3) elb(3) wri(3) tip(3)],'b')
 
 pos1 = [tip_r, basAngle_d, tip(3), handAngle_d];
-pos2 = [tip_r+100,180,tip(3),handAngle_d];
+pos2 = [tip_r,180,tip(3),handAngle_d];
 duration = 100;
 tvec = 0:duration; 
 
