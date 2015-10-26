@@ -31,7 +31,7 @@ offset = 0;
 for n=1:nmax
 clear rvec2 thvec2
 index = n+offset;
-tt = findZeroPrev(@(t)deltafn(t,tvec(index),10),tvec,index);
+tt = findZeroPrev(@(t)deltafn(t,tvec(index),10),tvec(index));
 % [sp,sm,rlim,slim] = findLimitS(sfun, ri, dr, rf(n));
 % rvec2 = rvec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
 % rvec2 = [rlim rvec2 rf(n)];
@@ -41,8 +41,14 @@ hFig = figure(1);
 set(hFig, 'Position', [100 100 1000 700])
 plot(tvec,afn(tvec),'b',tvec,sfn(tvec,0),'r',tvec(index),afn(tvec(index)),'b*',tvec(index),sfn(tvec(index),0),'r*');
 hold on
-plot(tvec,deltafn(tvec,tvec(index),10));
+plot([tt tt], [-20 180], 'k--')
+plot([tvec(index) tvec(index)], [-20 180], 'k--')
+% plot([0,tvec(end)], [0 0], 'k--')
+plot([0,tvec(end)], [10 10], 'k--')
+plot(tvec,deltafn(tvec,tvec(index),0),'k',tt,deltafn(tt,tvec(index),0),'k*');
 plot(tt,afn(tt),'c*',tt,sfn(tt,0),'m*');
+fill([tt tt tvec(index) tvec(index)], [-20 180 180 -20], 'b','EdgeColor','none','facealpha',0.2);
+fill([0,tvec(end), tvec(end),0], [10 10 0 0], 'b','EdgeColor','none','facealpha',0.2);
 hold off
 pause(0.02);
 %h = plot(rvec,thvec,'k',rvec,svec,'b',rvec,evec,'r',rf(n),sf(n),'b*',rf(n),ef(n),'r*',[rvec(n) rvec(n)],[0 200],'c:',rvec2,thvec2,'g');
