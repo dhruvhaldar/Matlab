@@ -1,5 +1,5 @@
 function create2dgif(rfn, afn, zfn, dfn, sfn, efn, wfn, deltafn, tvec)
-filename = '2dfig02.gif';
+% filename = '2dfig04.gif';
 
 % global HAND;
 global deltamax;
@@ -39,8 +39,7 @@ ttt = findZeroPrev(@(t)deltafn(t,tt,10),tt);
 % thvec2 = svec(dr*(rvec - rlim) > 0 & dr*(rvec - rf(n)) < 0);
 % thvec2 = [slim thvec2 sf(n)];
 hFig = figure(1);
-set(hFig,'units','normalized','outerposition',[0 0 0.6 0.9]);
-%set(hFig, 'Position', [100 100 1000 700])
+set(hFig, 'Position', [100 100 1000 700])
 h = plot(tvec,afn(tvec),'b',tvec,sfn(tvec,0),'m');
 hold on
 h(3:4) = plot(tvec(index),afn(tvec(index)),'g.',tvec(index),sfn(tvec(index),0),'g.','Color',[0.2 0.9 0.1],'MarkerSize',13.5);
@@ -61,8 +60,7 @@ hold off
 title('Robot Arm Linkage Position Estimation During Collision','fontweight','bold','fontsize',20)
 xlabel('Time (s)','FontWeight','bold','fontsize',14);
 ylabel('Respective Angle (Degrees)','fontweight','bold','fontsize',14);
-hlegend = legend(h([1 2 7 10 9 5 16 15]),'Azimuthal Angle','Elevation Angle','Anticipated Position','Disparity Angle','Threshold Angle','Expected Position','Acceptance Region','Possible Position','Location','NorthEastOutside');
-set(hlegend,'fontsize',12)
+legend(h([1 2 7 10 9 5 15]),'Azimuthal Angle','Elevation Angle','Anticipated Position','Disparity Angle','Threshold Angle','Expected Position','Possible Position','Location','NorthEastOutside');
 set(gca, ...
   'Box'         , 'off'     , ...
   'TickDir'     , 'out'     , ...
@@ -91,17 +89,13 @@ pause(0.02);
 % 
 
 
-      drawnow
-      frame = getframe(1);
-      im = frame2im(frame);
-      [imind,cm] = rgb2ind(im,256);
-      if n == 1;
-          imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
-      else
-          imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
-      end
-end
-
-for j=1:25
-    imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
+%       drawnow
+%       frame = getframe(1);
+%       im = frame2im(frame);
+%       [imind,cm] = rgb2ind(im,256);
+%       if n == 1;
+%           imwrite(imind,cm,filename,'gif', 'Loopcount',inf,'DelayTime',0.1);
+%       else
+%           imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1);
+%       end
 end
